@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# eco-config/catalog.yaml이 병합되어 생성된 결과
+catalog:
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  typescript: ^5.6.2
+  eslint: ^9.9.0
+  vite: ^5.4.0
