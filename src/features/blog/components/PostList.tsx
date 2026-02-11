@@ -46,7 +46,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
                 {post.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-xs text-white/50 hover:text-cyan-400 transition-colors"
+                    className="inline-flex w-fit items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200 transition-colors hover:border-cyan-300 hover:text-cyan-100"
                   >
                     #{tag}
                   </span>

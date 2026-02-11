@@ -43,7 +43,6 @@ export default function PostDetail({
       onUpdate()
     }
   }
-  }
 
   const handleDeletePost = async () => {
     if (confirm('Delete this post?')) {

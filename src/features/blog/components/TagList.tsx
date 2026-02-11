@@ -21,7 +21,7 @@ export default function TagList({
 
       <motion.button
         onClick={() => onTagSelect(null)}
-        className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
+        className={`flex w-fit items-center rounded-full px-4 py-2 text-sm transition-all ${
           selectedTag === null
             ? 'bg-white/20 text-white'
             : 'bg-white/5 text-white/60 hover:bg-white/10'
@@ -32,12 +32,12 @@ export default function TagList({
         All
       </motion.button>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {tags.map((tag) => (
           <motion.button
             key={tag}
             onClick={() => onTagSelect(tag)}
-            className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
+            className={`flex w-fit items-center rounded-full px-4 py-2 text-sm transition-all ${
               selectedTag === tag
                 ? 'bg-white/20 text-white'
                 : 'bg-white/5 text-white/60 hover:bg-white/10'

@@ -1,87 +1,42 @@
-import { motion } from 'framer-motion'
 import { BriefcaseBusiness } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '@/components/design/BackButton'
 import SectionHeader from '@/components/design/SectionHeader'
-import AppCard from '@/components/design/AppCard'
+import InfoSectionList from '@/components/design/InfoSectionList'
+import PageShell from '@/components/design/PageShell'
 
 export default function Profile() {
   const navigate = useNavigate()
+  const sections = [
+    {
+      title: 'Projects',
+      description: 'Add your flagship projects with concise outcomes.',
+    },
+    {
+      title: 'Experience',
+      description: 'Summarize your roles, scope, and responsibility.',
+    },
+    {
+      title: 'Tech Stack',
+      description: 'Mention the tools and languages you use most.',
+    },
+  ]
 
   return (
-    <div className="min-h-screen flex">
-      <motion.div
-        className="w-24 md:w-32 flex-shrink-0 bg-gradient-to-br from-lime-400 to-emerald-500 flex flex-col items-center justify-between p-6"
-        initial={{ width: '100vw', height: '100vh' }}
-        animate={{ width: '8rem', height: '100vh' }}
-        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <BackButton label="Home" onClick={() => navigate('/')} className="px-3" />
-        </motion.div>
-
-        <motion.div
-          initial={{ scale: 2.2 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        >
-          <BriefcaseBusiness className="h-9 w-9 text-white md:h-11 md:w-11" />
-        </motion.div>
-
-        <motion.div
-          className="text-white text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <div className="text-xs md:text-sm font-medium writing-vertical">Work</div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        className="flex-1 overflow-y-auto p-8 md:p-12"
-        initial={{ opacity: 0, x: 100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        <div className="mx-auto max-w-4xl">
-          <SectionHeader
-            title="Profile"
-            subtitle="Selected projects and how I build products."
-            accentClassName="from-lime-400 to-emerald-500"
-          />
-
-          <motion.div
-            className="space-y-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55 }}
-          >
-            <AppCard>
-              <h2 className="mb-3 text-2xl font-semibold text-white">Projects</h2>
-              <p className="leading-relaxed text-white/70">
-                Add your flagship projects with concise outcomes.
-              </p>
-            </AppCard>
-            <AppCard>
-              <h2 className="mb-3 text-2xl font-semibold text-white">Experience</h2>
-              <p className="leading-relaxed text-white/70">
-                Summarize your roles, scope, and responsibility.
-              </p>
-            </AppCard>
-            <AppCard>
-              <h2 className="mb-3 text-2xl font-semibold text-white">Tech Stack</h2>
-              <p className="leading-relaxed text-white/70">
-                Mention the tools and languages you use most.
-              </p>
-            </AppCard>
-          </motion.div>
+    <PageShell icon={BriefcaseBusiness}>
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-6">
+          <BackButton label="Home" onClick={() => navigate('/')} />
         </div>
-      </motion.div>
-    </div>
+
+        <SectionHeader
+          title="Profile"
+          subtitle="Selected projects and how I build products."
+          accentClassName="from-lime-400 to-emerald-500"
+        />
+
+        <InfoSectionList sections={sections} />
+      </div>
+    </PageShell>
   )
 }
