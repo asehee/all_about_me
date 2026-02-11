@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: 225 36% 8%;
+  --foreground: 210 40% 98%;
+  --card: 220 28% 13%;
+  --card-foreground: 210 40% 98%;
+  --border: 218 20% 28%;
+  --input: 218 20% 28%;
+  --ring: 193 100% 64%;
+  --primary: 193 100% 64%;
+  --primary-foreground: 230 35% 10%;
+  --secondary: 220 22% 20%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 220 20% 18%;
+  --muted-foreground: 215 20% 72%;
+  --accent: 200 95% 58%;
+  --accent-foreground: 230 35% 10%;
+  --destructive: 0 75% 54%;
+  --destructive-foreground: 0 0% 100%;
+  --popover: 220 26% 12%;
+  --popover-foreground: 210 40% 98%;
+  --radius: 0.9rem;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,5 +32,21 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  color: hsl(var(--foreground));
+  font-family: 'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.18), transparent 35%),
+    radial-gradient(circle at 85% 10%, rgba(244, 114, 182, 0.14), transparent 40%),
+    linear-gradient(160deg, #060910 0%, #090d18 45%, #06080f 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
