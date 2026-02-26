@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, Tag, MessageCircle, Send, Trash2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Tag, MessageCircle, Send, Trash2, Pencil } from 'lucide-react'
 import type { Post, Comment } from '@/types/blog'
 import { useState } from 'react'
 import { mockBlogApi } from '@/services/mockBlogApi'
@@ -7,6 +7,7 @@ import { mockBlogApi } from '@/services/mockBlogApi'
 interface PostDetailProps {
   post: Post
   onBack: () => void
+  onEdit: () => void
   onUpdate: () => void
   onDelete: () => void
 }
@@ -14,6 +15,7 @@ interface PostDetailProps {
 export default function PostDetail({
   post,
   onBack,
+  onEdit,
   onUpdate,
   onDelete,
 }: PostDetailProps) {
@@ -28,7 +30,6 @@ export default function PostDetail({
     await mockBlogApi.addComment({
       postId: post.id,
       parentId,
-      author: 'Anonymous',
       content: commentContent.trim(),
     })
     setCommentContent('')
@@ -48,7 +49,6 @@ export default function PostDetail({
     if (confirm('Delete this post?')) {
       await mockBlogApi.deletePost(post.id)
       await onDelete()
-      onBack()
     }
   }
 
@@ -140,13 +140,22 @@ export default function PostDetail({
             <span>Back</span>
           </button>
 
-          <button
-            onClick={handleDeletePost}
-            className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-2 px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={handleDeletePost}
+              className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
         </div>
 
         {/* 포스트 내용 */}

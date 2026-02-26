@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Calendar, Tag } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import type { Post } from '@/types/blog'
 
 interface PostListProps {
@@ -17,50 +17,67 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+      <div className="hidden md:grid grid-cols-[72px_minmax(0,1fr)_140px_120px] gap-4 px-5 py-3 border-b border-white/10 text-xs font-semibold text-white/50 uppercase tracking-wide">
+        <span>No</span>
+        <span>Title</span>
+        <span>Author</span>
+        <span>Date</span>
+      </div>
+
       {posts.map((post, index) => (
-        <motion.article
+        <motion.button
           key={post.id}
-          initial={{ opacity: 0, y: 20 }}
+          type="button"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          whileHover={{ y: -4 }}
+          transition={{ delay: index * 0.04 }}
           onClick={() => onPostClick(post)}
-          className="group cursor-pointer"
+          className="w-full text-left px-5 py-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
         >
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all h-full flex flex-col">
-            {/* 제목 */}
-            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
-              {post.title}
-            </h3>
+          <div className="md:grid md:grid-cols-[72px_minmax(0,1fr)_140px_120px] md:items-center md:gap-4">
+            <span className="hidden md:block text-sm text-white/40">
+              {posts.length - index}
+            </span>
 
-            {/* 내용 미리보기 */}
-            <p className="text-white/60 text-sm mb-4 line-clamp-3 flex-1">
-              {post.content}
-            </p>
-
-            {/* 태그 */}
-            {post.tags.length > 0 && (
-              <div className="flex items-center gap-2 mb-4 flex-wrap">
-                <Tag className="w-3 h-3 text-white/40" />
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex w-fit items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200 transition-colors hover:border-cyan-300 hover:text-cyan-100"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-white truncate hover:text-cyan-300 transition-colors">
+                {post.title}
+              </h3>
+              <p className="mt-1 text-sm text-white/50 line-clamp-1">
+                {post.content}
+              </p>
+              <div className="mt-2 flex items-center gap-3 text-xs text-white/40 md:hidden">
+                <span>{post.author}</span>
+                <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
               </div>
-            )}
-
-            {/* 날짜 */}
-            <div className="flex items-center gap-2 text-xs text-white/40">
-              <Calendar className="w-3 h-3" />
-              {new Date(post.createdAt).toLocaleDateString('ko-KR')}
             </div>
+
+            <span className="hidden md:block text-sm text-white/60">
+              {post.author}
+            </span>
+            <span className="hidden md:block text-sm text-white/40">
+              {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+            </span>
           </div>
-        </motion.article>
+
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+            <span className="inline-flex items-center gap-1 text-xs text-white/40">
+              <MessageCircle className="w-3 h-3" />
+              {post.comments.length}
+            </span>
+          </div>
+        </motion.button>
       ))}
     </div>
   )

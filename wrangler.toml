@@ -1,0 +1,23 @@
+name = "all-about-me-api"
+main = "worker/src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+CORS_ORIGINS = "http://localhost:5173"
+RATE_LIMIT_MAX_WRITES = "30"
+RATE_LIMIT_WINDOW_SECONDS = "60"
+# For local secured writes without external auth:
+# AUTH_BEARER_TOKEN = "change-me"
+# For Cloudflare Access JWT:
+# CF_ACCESS_TEAM_DOMAIN = "your-team.cloudflareaccess.com"
+# CF_ACCESS_AUD = "your-access-aud"
+# For Clerk JWT:
+# CLERK_JWKS_URL = "https://your-clerk-domain/.well-known/jwks.json"
+# CLERK_ISSUER = "https://your-clerk-domain"
+# CLERK_AUDIENCE = "your-audience"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "journal-db"
+database_id = "e814f76a-5ac0-4d0b-badf-b3b5129f672c"
+migrations_dir = "worker/migrations"

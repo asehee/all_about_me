@@ -12,6 +12,9 @@ export interface Post {
   id: string
   title: string
   content: string
+  slug: string
+  status: 'draft' | 'published'
+  publishedAt: string | null
   tags: string[]
   author: string
   createdAt: string
@@ -22,19 +25,21 @@ export interface Post {
 export interface CreatePostDTO {
   title: string
   content: string
-  tags: string[]
-  author: string
+  tags?: string[]
+  status?: 'draft' | 'published'
+  publishedAt?: string | null
 }
 
 export interface UpdatePostDTO {
   title?: string
   content?: string
   tags?: string[]
+  status?: 'draft' | 'published'
+  publishedAt?: string | null
 }
 
 export interface CreateCommentDTO {
   postId: string
   parentId: string | null
-  author: string
   content: string
 }

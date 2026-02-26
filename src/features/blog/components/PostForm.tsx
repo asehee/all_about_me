@@ -1,19 +1,34 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, Save, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { mockBlogApi } from '@/services/mockBlogApi'
+import type { Post } from '@/types/blog'
 
 interface PostFormProps {
+  mode?: 'create' | 'edit'
+  initialPost?: Post | null
   onBack: () => void
   onSuccess: () => void
 }
 
-export default function PostForm({ onBack, onSuccess }: PostFormProps) {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+export default function PostForm({
+  mode = 'create',
+  initialPost = null,
+  onBack,
+  onSuccess,
+}: PostFormProps) {
+  const [title, setTitle] = useState(initialPost?.title ?? '')
+  const [content, setContent] = useState(initialPost?.content ?? '')
   const [tagInput, setTagInput] = useState('')
-  const [tags, setTags] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>(initialPost?.tags ?? [])
   const [saving, setSaving] = useState(false)
+  const isEditMode = mode === 'edit' && !!initialPost
+
+  useEffect(() => {
+    setTitle(initialPost?.title ?? '')
+    setContent(initialPost?.content ?? '')
+    setTags(initialPost?.tags ?? [])
+  }, [initialPost])
 
   const handleAddTag = () => {
     const trimmed = tagInput.trim()
@@ -41,12 +56,19 @@ export default function PostForm({ onBack, onSuccess }: PostFormProps) {
     }
 
     setSaving(true)
-    await mockBlogApi.createPost({
-      title: title.trim(),
-      content: content.trim(),
-      tags,
-      author: 'Admin',
-    })
+    if (isEditMode && initialPost) {
+      await mockBlogApi.updatePost(initialPost.id, {
+        title: title.trim(),
+        content: content.trim(),
+        tags,
+      })
+    } else {
+      await mockBlogApi.createPost({
+        title: title.trim(),
+        content: content.trim(),
+        tags,
+      })
+    }
     setSaving(false)
     onSuccess()
   }
@@ -75,7 +97,7 @@ export default function PostForm({ onBack, onSuccess }: PostFormProps) {
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-5 h-5" />
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Saving...' : isEditMode ? 'Update' : 'Save'}
           </button>
         </div>
 

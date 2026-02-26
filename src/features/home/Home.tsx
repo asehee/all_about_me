@@ -8,28 +8,28 @@ const menuItems = [
     id: 'about',
     icon: UserRound,
     label: 'About',
-    description: 'Who I am',
+    description: 'Who I am and how I work',
     color: 'from-cyan-400 to-blue-500',
   },
   {
     id: 'blog',
     icon: PenLine,
-    label: 'Journal',
-    description: 'Thoughts and notes',
+    label: 'Thoughts',
+    description: 'Journal posts and ideas',
     color: 'from-rose-400 to-orange-500',
   },
   {
     id: 'profile',
     icon: BriefcaseBusiness,
     label: 'Work',
-    description: 'Portfolio and craft',
+    description: 'Projects and experience',
     color: 'from-lime-400 to-emerald-500',
   },
   {
     id: 'etc',
     icon: Sparkles,
     label: 'Labs',
-    description: 'Experiments and more',
+    description: 'Experiments and side notes',
     color: 'from-fuchsia-400 to-violet-500',
   },
 ]
@@ -56,11 +56,8 @@ export default function Home() {
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-4xl font-bold tracking-tight text-white md:text-6xl">
-            WELCOME
+            blog by asehee
           </h1>
-          <p className="mt-2 text-sm text-white/60 md:text-base">
-            Choose where to start
-          </p>
         </motion.div>
 
         <div className="grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 md:gap-7">
@@ -87,7 +84,6 @@ export default function Home() {
                       <h3 className="text-xl font-semibold text-white md:text-2xl">
                         {item.label}
                       </h3>
-                      <p className="mt-1 text-sm text-white/65">{item.description}</p>
                     </div>
                   </div>
                 </AppCard>
