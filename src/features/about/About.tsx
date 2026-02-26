@@ -9,17 +9,17 @@ export default function About() {
   const experiences = [
     {
       period: '2024.06 - Present',
-      company: 'Company A',
-      role: 'Frontend Developer',
+      company: 'Com2us Coporation',
+      role: 'Software Developer',
       description:
-        'test',
+        'write something here',
     },
     {
       period: '2022.01 - 2024.06',
-      company: 'Company B',
-      role: 'Product Engineer',
+      company: 'CAiTORY',
+      role: 'Software Developer',
       description:
-        'test',
+        'write something here',
     },
   ]
   const skills = ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Node.js', 'Cloudflare']
@@ -38,16 +38,16 @@ export default function About() {
         />
 
         <section className="relative">
-          <div className="absolute left-3 top-0 h-full w-px bg-gradient-to-b from-cyan-400/80 via-blue-400/70 to-transparent" />
+          <div className="absolute left-[11.5px] top-0 z-0 h-full w-px bg-gradient-to-b from-cyan-400/40 via-blue-400/30 to-transparent" />
 
           <div className="space-y-10">
             {experiences.map((item) => (
               <article key={item.company} className="grid grid-cols-[24px_minmax(0,1fr)] gap-4">
-                <div className="flex justify-center pt-2">
-                  <div className="h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_0_6px_rgba(34,211,238,0.15)]" />
+                <div className="relative z-10 flex justify-center pt-2">
+                  <div className="h-3 w-3 rounded-full bg-cyan-600 shadow-[0_0_0_6px_rgba(8,145,178,0.32)]" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300/90">
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-cyan-300/90">
                     {item.period}
                   </p>
                   <h3 className="mt-1 text-2xl font-semibold text-white">{item.company}</h3>

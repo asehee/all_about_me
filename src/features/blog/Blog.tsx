@@ -10,6 +10,7 @@ import TagList from './components/TagList'
 import PostDetail from './components/PostDetail'
 import PostForm from './components/PostForm'
 import PageShell from '@/components/design/PageShell'
+import Modal from '@/components/design/Modal'
 
 export default function Blog() {
   const navigate = useNavigate()
@@ -131,76 +132,70 @@ export default function Blog() {
 
   return (
     <PageShell icon={BookOpen}>
-      {noticeMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Notice</h3>
-            <p className="mt-3 text-sm text-white/70">{noticeMessage}</p>
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setNoticeMessage(null)}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Write Token Required</h3>
-            <p className="mt-3 text-sm text-white/70">
-              Creating a post requires an authentication token. Please set your write
-              token first.
-            </p>
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Close
-              </button>
-              <button
-                onClick={openTokenInputModal}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
-              >
-                Set Write Token
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showTokenInputModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Set Write Token</h3>
-            <input
-              type="password"
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              placeholder="Enter write token"
-              className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
-            />
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => setShowTokenInputModal(false)}
-                className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveWriteToken}
-                disabled={!tokenInput.trim()}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={Boolean(noticeMessage)}
+        title="Notice"
+        description={noticeMessage ?? undefined}
+        actions={
+          <button
+            onClick={() => setNoticeMessage(null)}
+            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+          >
+            OK
+          </button>
+        }
+      />
+      <Modal
+        open={showAuthModal}
+        title="Write Token Required"
+        description="Creating a post requires an authentication token. Please set your write token first."
+        actions={
+          <>
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+            >
+              Close
+            </button>
+            <button
+              onClick={openTokenInputModal}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+            >
+              Set Write Token
+            </button>
+          </>
+        }
+      />
+      <Modal
+        open={showTokenInputModal}
+        title="Set Write Token"
+        children={
+          <input
+            type="password"
+            value={tokenInput}
+            onChange={(e) => setTokenInput(e.target.value)}
+            placeholder="Enter write token"
+            className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
+          />
+        }
+        actions={
+          <>
+            <button
+              onClick={() => setShowTokenInputModal(false)}
+              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveWriteToken}
+              disabled={!tokenInput.trim()}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
+            >
+              Save
+            </button>
+          </>
+        }
+      />
       {selectedPost ? (
         <PostDetail
           post={selectedPost}

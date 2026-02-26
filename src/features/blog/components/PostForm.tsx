@@ -3,6 +3,7 @@ import { ArrowLeft, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { mockBlogApi } from '@/services/mockBlogApi'
 import type { Post } from '@/types/blog'
+import Modal from '@/components/design/Modal'
 
 interface PostFormProps {
   mode?: 'create' | 'edit'
@@ -81,22 +82,19 @@ export default function PostForm({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
     >
-      {validationMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Validation</h3>
-            <p className="mt-3 text-sm text-white/70">{validationMessage}</p>
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setValidationMessage(null)}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={Boolean(validationMessage)}
+        title="Validation"
+        description={validationMessage ?? undefined}
+        actions={
+          <button
+            onClick={() => setValidationMessage(null)}
+            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+          >
+            OK
+          </button>
+        }
+      />
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">

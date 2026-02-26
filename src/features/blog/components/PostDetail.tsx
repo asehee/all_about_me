@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Tag, MessageCircle, Send, Trash2, Pencil } from 'l
 import type { Post, Comment } from '@/types/blog'
 import { useState } from 'react'
 import { mockBlogApi, writeTokenManager } from '@/services/mockBlogApi'
+import Modal from '@/components/design/Modal'
 
 interface PostDetailProps {
   post: Post
@@ -158,67 +159,65 @@ export default function PostDetail({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
     >
-      {showTokenModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Write Token Required</h3>
-            <p className="mt-3 text-sm text-white/70">
-              Deleting a post requires an authentication token.
-            </p>
-            <input
-              type="password"
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              placeholder="Enter write token"
-              className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
-            />
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setShowTokenModal(false)
-                  setTokenInput('')
-                }}
-                className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveWriteToken}
-                disabled={!tokenInput.trim()}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {confirmState && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-white">Confirm</h3>
-            <p className="mt-3 text-sm text-white/70">
-              {confirmState.type === 'delete-post'
-                ? 'Delete this post?'
-                : 'Delete this comment?'}
-            </p>
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => setConfirmState(null)}
-                className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmAction}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showTokenModal}
+        title="Write Token Required"
+        description="Deleting a post requires an authentication token."
+        children={
+          <input
+            type="password"
+            value={tokenInput}
+            onChange={(e) => setTokenInput(e.target.value)}
+            placeholder="Enter write token"
+            className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
+          />
+        }
+        actions={
+          <>
+            <button
+              onClick={() => {
+                setShowTokenModal(false)
+                setTokenInput('')
+              }}
+              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveWriteToken}
+              disabled={!tokenInput.trim()}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
+            >
+              Save
+            </button>
+          </>
+        }
+      />
+      <Modal
+        open={Boolean(confirmState)}
+        title="Confirm"
+        description={
+          confirmState?.type === 'delete-post'
+            ? 'Delete this post?'
+            : 'Delete this comment?'
+        }
+        actions={
+          <>
+            <button
+              onClick={() => setConfirmState(null)}
+              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmAction}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
+            >
+              Delete
+            </button>
+          </>
+        }
+      />
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
