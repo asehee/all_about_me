@@ -84,8 +84,8 @@ export const authenticateWriteRequest = async (ctx: RequestContext): Promise<Aut
     }
 
     return {
-      id: 'token-user',
-      name: 'Token User',
+      id: 'asehee',
+      name: 'asehee',
     }
   }
 

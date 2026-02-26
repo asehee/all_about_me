@@ -71,8 +71,8 @@ Features added:
    npm run d1:migrate:local
    ```
 2. Optional local write auth:
-   - `wrangler.toml` `[vars]` add `AUTH_BEARER_TOKEN`
-   - `.env.local` add matching `VITE_API_BEARER_TOKEN`
+   - set Worker secret `AUTH_BEARER_TOKEN`
+   - in browser, click `Set Write Token` in Journal page and paste the same token
 3. Run Worker API:
    ```bash
    npm run worker:dev
@@ -114,6 +114,21 @@ This project is deployed as two separate services:
    ```bash
    npm run pages:deploy:prod
    ```
+
+### Secure write flow (fix 401 on create/update/delete)
+
+If journal writes return `401 UNAUTHORIZED`:
+1. Set Worker secret:
+   ```bash
+   AUTH_BEARER_TOKEN="your-strong-token" npm run worker:secret:auth
+   ```
+2. Deploy backend and frontend:
+   ```bash
+   VITE_API_BASE_URL="https://all-about-me-api.asehee127.workers.dev" npm run release:prod:auth
+   ```
+3. Open Journal page and click `Set Write Token`, then paste `your-strong-token`.
+
+This keeps the token out of the frontend bundle and stores it only in browser `sessionStorage`.
 
 Current runtime endpoints:
 

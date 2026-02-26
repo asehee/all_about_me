@@ -3,7 +3,7 @@ main = "worker/src/index.ts"
 compatibility_date = "2025-01-01"
 
 [vars]
-CORS_ORIGINS = "http://localhost:5173"
+CORS_ORIGINS = "http://localhost:5173,https://hee.dance,https://new-project-b6d.pages.dev,https://all-about-me.new-project-b6d.pages.dev"
 RATE_LIMIT_MAX_WRITES = "30"
 RATE_LIMIT_WINDOW_SECONDS = "60"
 # For local secured writes without external auth:

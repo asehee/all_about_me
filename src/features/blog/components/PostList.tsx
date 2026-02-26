@@ -47,6 +47,18 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
               <p className="mt-1 text-sm text-white/50 line-clamp-1">
                 {post.content}
               </p>
+              {post.tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="mt-2 flex items-center gap-3 text-xs text-white/40 md:hidden">
                 <span>{post.author}</span>
                 <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
@@ -61,17 +73,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
             </span>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+          <div className="mt-3 flex items-center justify-end">
             <span className="inline-flex items-center gap-1 text-xs text-white/40">
               <MessageCircle className="w-3 h-3" />
               {post.comments.length}

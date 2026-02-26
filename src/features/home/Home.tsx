@@ -56,7 +56,7 @@ export default function Home() {
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-4xl font-bold tracking-tight text-white md:text-6xl">
-            blog by asehee
+            hee.dance
           </h1>
         </motion.div>
 

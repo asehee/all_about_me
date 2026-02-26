@@ -7,18 +7,20 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:preview": "VITE_API_BASE_URL=https://all-about-me-api.asehee127.workers.dev npm run build",
-    "build:prod": "VITE_API_BASE_URL=https://all-about-me-api.asehee127.workers.dev npm run build",
+    "build:prod": "sh -c 'test -n \"$VITE_API_BASE_URL\" || { echo \"VITE_API_BASE_URL is required\"; exit 1; }; npm run build'",
     "lint": "eslint .",
     "preview": "vite preview",
     "worker:dev": "wrangler dev --config wrangler.toml",
     "worker:deploy": "wrangler deploy --config wrangler.toml",
     "worker:tail": "wrangler tail --config wrangler.toml",
+    "worker:secret:auth": "sh -c 'test -n \"$AUTH_BEARER_TOKEN\" || { echo \"AUTH_BEARER_TOKEN is required\"; exit 1; }; printf \"%s\" \"$AUTH_BEARER_TOKEN\" | wrangler secret put AUTH_BEARER_TOKEN --config wrangler.toml'",
     "d1:create": "wrangler d1 create journal-db --config wrangler.toml",
     "d1:list": "wrangler d1 list --config wrangler.toml",
     "d1:migrate:local": "wrangler d1 migrations apply journal-db --local --config wrangler.toml",
     "d1:migrate:remote": "wrangler d1 migrations apply journal-db --remote --config wrangler.toml",
-    "pages:deploy:preview": "npm run build:preview && wrangler pages deploy dist --config wrangler.pages.toml --project-name new-project --branch all-about-me --commit-dirty=true",
-    "pages:deploy:prod": "npm run build:prod && wrangler pages deploy dist --config wrangler.pages.toml --project-name new-project --branch production --commit-dirty=true"
+    "pages:deploy:preview": "npm run build:preview && wrangler pages deploy dist --project-name new-project --branch all-about-me --commit-dirty=true",
+    "pages:deploy:prod": "npm run build:prod && wrangler pages deploy dist --project-name new-project --branch production --commit-dirty=true",
+    "release:prod:auth": "npm run d1:migrate:remote && npm run worker:secret:auth && npm run worker:deploy && npm run pages:deploy:prod"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",

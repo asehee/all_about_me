@@ -8,7 +8,7 @@ import type {
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 const API_PREFIX = `${API_BASE_URL}/api`
-const API_BEARER_TOKEN = import.meta.env.VITE_API_BEARER_TOKEN
+const WRITE_TOKEN_STORAGE_KEY = 'journal_write_token'
 
 class ApiError extends Error {
   status: number
@@ -32,15 +32,17 @@ interface ApiErrorResponse {
 }
 
 const withAuthHeader = (init?: RequestInit): RequestInit => {
-  if (!API_BEARER_TOKEN) return init ?? {}
+  if (typeof window === 'undefined') return init ?? {}
   const method = (init?.method ?? 'GET').toUpperCase()
   if (method === 'GET' || method === 'OPTIONS') return init ?? {}
+  const writeToken = window.sessionStorage.getItem(WRITE_TOKEN_STORAGE_KEY)
+  if (!writeToken) return init ?? {}
 
   return {
     ...init,
     headers: {
       ...(init?.headers ?? {}),
-      Authorization: `Bearer ${API_BEARER_TOKEN}`,
+      Authorization: `Bearer ${writeToken}`,
     },
   }
 }
@@ -91,6 +93,21 @@ interface TagsResponse {
 
 interface CommentResponse {
   comment: Comment
+}
+
+export const writeTokenManager = {
+  set(token: string) {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.setItem(WRITE_TOKEN_STORAGE_KEY, token.trim())
+  },
+  clear() {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.removeItem(WRITE_TOKEN_STORAGE_KEY)
+  },
+  exists() {
+    if (typeof window === 'undefined') return false
+    return Boolean(window.sessionStorage.getItem(WRITE_TOKEN_STORAGE_KEY))
+  },
 }
 
 export const mockBlogApi = {

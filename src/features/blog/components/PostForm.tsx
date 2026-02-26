@@ -22,6 +22,7 @@ export default function PostForm({
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>(initialPost?.tags ?? [])
   const [saving, setSaving] = useState(false)
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const isEditMode = mode === 'edit' && !!initialPost
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function PostForm({
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      alert('Please enter title and content')
+      setValidationMessage('Please enter title and content')
       return
     }
 
@@ -80,6 +81,22 @@ export default function PostForm({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
     >
+      {validationMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111827] p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-white">Validation</h3>
+            <p className="mt-3 text-sm text-white/70">{validationMessage}</p>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setValidationMessage(null)}
+                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">

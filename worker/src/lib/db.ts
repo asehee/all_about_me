@@ -83,6 +83,15 @@ const replacePostTags = async (db: D1Database, postId: number, tags: string[]): 
       .bind(postId, tag)
       .run()
   }
+
+  await db
+    .prepare(
+      `DELETE FROM tags
+       WHERE id NOT IN (
+         SELECT DISTINCT tag_id FROM post_tags
+       )`,
+    )
+    .run()
 }
 
 const fetchTagsByPostId = async (db: D1Database, postId: number): Promise<string[]> => {
@@ -278,12 +287,29 @@ export const deletePost = async (db: D1Database, postId: number): Promise<boolea
   await db.prepare('DELETE FROM comments WHERE post_id = ?').bind(postId).run()
   await db.prepare('DELETE FROM post_tags WHERE post_id = ?').bind(postId).run()
   await db.prepare('DELETE FROM posts WHERE id = ?').bind(postId).run()
+  await db
+    .prepare(
+      `DELETE FROM tags
+       WHERE id NOT IN (
+         SELECT DISTINCT tag_id FROM post_tags
+       )`,
+    )
+    .run()
 
   return true
 }
 
 export const listTags = async (db: D1Database): Promise<string[]> => {
-  const result = await db.prepare('SELECT name FROM tags ORDER BY name ASC').all<{ name: string }>()
+  const result = await db
+    .prepare(
+      `SELECT t.name
+       FROM tags t
+       WHERE EXISTS (
+         SELECT 1 FROM post_tags pt WHERE pt.tag_id = t.id
+       )
+       ORDER BY t.name ASC`,
+    )
+    .all<{ name: string }>()
   return (result.results ?? []).map((row) => row.name)
 }
 
