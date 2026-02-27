@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { MessageCircle } from 'lucide-react'
 import type { Post } from '@/types/blog'
 
 interface PostListProps {
@@ -17,8 +16,8 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-      <div className="hidden md:grid grid-cols-[72px_minmax(0,1fr)_140px_120px] gap-4 px-5 py-3 border-b border-white/10 text-xs font-semibold text-white/50 uppercase tracking-wide">
+    <div className="overflow-hidden border border-white/12">
+      <div className="hidden md:grid grid-cols-[72px_minmax(0,1fr)_140px_120px] gap-4 border-b border-white/12 px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white/45">
         <span>No</span>
         <span>Title</span>
         <span>Author</span>
@@ -33,7 +32,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.04 }}
           onClick={() => onPostClick(post)}
-          className="w-full text-left px-5 py-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
+          className="w-full border-b border-white/12 px-5 py-4 text-left last:border-b-0 hover:bg-white/[0.03] transition-colors"
         >
           <div className="md:grid md:grid-cols-[72px_minmax(0,1fr)_140px_120px] md:items-center md:gap-4">
             <span className="hidden md:block text-sm text-white/40">
@@ -41,7 +40,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
             </span>
 
             <div className="min-w-0">
-              <h3 className="text-base font-semibold text-white truncate hover:text-cyan-300 transition-colors">
+              <h3 className="truncate text-base font-semibold text-white">
                 {post.title}
               </h3>
               <p className="mt-1 text-sm text-white/50 line-clamp-1">
@@ -52,7 +51,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200"
+                      className="inline-flex items-center rounded-full border border-white/20 bg-white/[0.03] px-2.5 py-1 text-xs text-white/70"
                     >
                       #{tag}
                     </span>
@@ -75,8 +74,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
 
           <div className="mt-3 flex items-center justify-end">
             <span className="inline-flex items-center gap-1 text-xs text-white/40">
-              <MessageCircle className="w-3 h-3" />
-              {post.comments.length}
+              comments {post.comments.length}
             </span>
           </div>
         </motion.button>

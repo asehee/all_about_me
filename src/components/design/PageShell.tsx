@@ -14,7 +14,7 @@ export default function PageShell({
   contentClassName,
 }: PageShellProps) {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black text-white">
       <motion.div
         className="fixed left-6 top-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-black/55 text-white backdrop-blur-md"
         initial={{ opacity: 0, scale: 0.9 }}
@@ -26,7 +26,7 @@ export default function PageShell({
 
       <motion.div
         className={cn(
-          'overflow-y-auto p-8 pt-24 md:p-12 md:pt-24',
+          'min-h-screen overflow-y-auto p-8 pt-24 md:p-12 md:pt-24',
           contentClassName
         )}
         initial={{ opacity: 0, y: 14 }}

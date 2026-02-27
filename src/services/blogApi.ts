@@ -5,31 +5,11 @@ import type {
   Comment,
   CreateCommentDTO,
 } from '@/types/blog'
+import { ApiError, toApiError } from '@/services/apiError'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 const API_PREFIX = `${API_BASE_URL}/api`
 const WRITE_TOKEN_STORAGE_KEY = 'journal_write_token'
-
-class ApiError extends Error {
-  status: number
-  code?: string
-  details?: unknown
-
-  constructor(message: string, status: number, code?: string, details?: unknown) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.code = code
-    this.details = details
-  }
-}
-
-interface ApiErrorResponse {
-  code: string
-  message: string
-  details?: unknown
-  requestId?: string
-}
 
 const withAuthHeader = (init?: RequestInit): RequestInit => {
   if (typeof window === 'undefined') return init ?? {}
@@ -58,18 +38,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   })
 
   if (!response.ok) {
-    let message = `Request failed: ${response.status}`
-    let code: string | undefined
-    let details: unknown
-    try {
-      const errorBody = (await response.json()) as ApiErrorResponse
-      if (errorBody.message) message = errorBody.message
-      code = errorBody.code
-      details = errorBody.details
-    } catch {
-      // Use default message if body is not JSON.
-    }
-    throw new ApiError(message, response.status, code, details)
+    throw await toApiError(response)
   }
 
   if (response.status === 204) {
@@ -110,7 +79,7 @@ export const writeTokenManager = {
   },
 }
 
-export const mockBlogApi = {
+export const blogApi = {
   async getPosts(): Promise<Post[]> {
     const data = await request<PostsResponse>('/posts')
     return data.posts

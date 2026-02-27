@@ -10,3 +10,7 @@ Built with React, TypeScript, and Tailwind CSS, featuring a clean design system 
 - **Build Tool**: Vite
 - **Package Manager**: npm/pnpm
 
+## Workflow
+
+- Frontend publishing-first rules: `AGENTS.md`
+- Frontend task checklist: `docs/frontend-checklist.md`

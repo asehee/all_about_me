@@ -2,9 +2,8 @@ import { BookOpen, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { Post } from '@/types/blog'
-import { mockBlogApi, writeTokenManager } from '@/services/mockBlogApi'
+import { blogApi, writeTokenManager } from '@/services/blogApi'
 import BackButton from '@/components/design/BackButton'
-import SectionHeader from '@/components/design/SectionHeader'
 import PostList from './components/PostList'
 import TagList from './components/TagList'
 import PostDetail from './components/PostDetail'
@@ -39,8 +38,8 @@ export default function Blog() {
     setError(null)
     try {
       const [fetchedPosts, fetchedTags] = await Promise.all([
-        mockBlogApi.getPosts(),
-        mockBlogApi.getTags(),
+        blogApi.getPosts(),
+        blogApi.getTags(),
       ])
       setPosts(fetchedPosts)
       setTags(fetchedTags)
@@ -131,7 +130,7 @@ export default function Blog() {
   }
 
   return (
-    <PageShell icon={BookOpen}>
+    <PageShell icon={BookOpen} contentClassName="bg-black">
       <Modal
         open={Boolean(noticeMessage)}
         title="Notice"
@@ -139,7 +138,7 @@ export default function Blog() {
         actions={
           <button
             onClick={() => setNoticeMessage(null)}
-            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+            className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors"
           >
             OK
           </button>
@@ -159,7 +158,7 @@ export default function Blog() {
             </button>
             <button
               onClick={openTokenInputModal}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+              className="rounded-lg border border-white/20 bg-white text-sm font-medium text-black px-4 py-2 hover:bg-white/90 transition-colors"
             >
               Set Write Token
             </button>
@@ -175,7 +174,7 @@ export default function Blog() {
             value={tokenInput}
             onChange={(e) => setTokenInput(e.target.value)}
             placeholder="Enter write token"
-            className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
+            className="mt-4 w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
           />
         }
         actions={
@@ -189,7 +188,7 @@ export default function Blog() {
             <button
               onClick={handleSaveWriteToken}
               disabled={!tokenInput.trim()}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
+              className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
             >
               Save
             </button>
@@ -217,7 +216,17 @@ export default function Blog() {
             <BackButton label="Home" onClick={() => navigate('/')} />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <header>
+            <p className="text-xs uppercase tracking-[0.18em] text-white/45">Journal</p>
+            <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
+              Notes 
+            </h1>
+            <p className="mt-5 text-sm text-white/62 md:text-base">
+              {filteredPosts.length} posts
+            </p>
+          </header>
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
             <div className="order-2 lg:order-1">
               <TagList
                 tags={tags}
@@ -227,26 +236,23 @@ export default function Blog() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="mb-8 flex items-center justify-between gap-4">
-                <SectionHeader
-                  className="mb-0"
-                  title={selectedTag ? `#${selectedTag}` : 'Notes'}
-                  subtitle={`${filteredPosts.length} posts`}
-                  accentClassName="from-blue-500 to-cyan-500"
-                />
+              <div className="mb-8 flex min-h-[42px] flex-wrap items-center justify-between gap-4 border-b border-white/12 pb-4">
+                <p className="text-sm text-white/60">
+                  {selectedTag ? `Filter: #${selectedTag}` : 'All posts'}
+                </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={hasWriteToken ? handleClearWriteToken : openTokenInputModal}
-                    className="px-4 py-2 border border-white/20 rounded-lg text-white/80 hover:bg-white/10 transition-colors text-sm"
+                    className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
                   >
                     {hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
                   </button>
                   <button
                     onClick={handleCreatePost}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-lg border border-white/20 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-white/90 transition-colors"
                   >
-                    <Plus className="w-5 h-5" />
-                    New Post
+                    <Plus className="w-4 h-4" />
+                    New
                   </button>
                 </div>
               </div>
@@ -256,7 +262,7 @@ export default function Blog() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by title, content, author"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
                 />
               </div>
 

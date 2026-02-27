@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, Tag, MessageCircle, Send, Trash2, Pencil } from 'lucide-react'
 import type { Post, Comment } from '@/types/blog'
 import { useState } from 'react'
-import { mockBlogApi, writeTokenManager } from '@/services/mockBlogApi'
+import { blogApi, writeTokenManager } from '@/services/blogApi'
 import Modal from '@/components/design/Modal'
 
 interface PostDetailProps {
@@ -34,7 +34,7 @@ export default function PostDetail({
     if (!commentContent.trim()) return
 
     setSubmitting(true)
-    await mockBlogApi.addComment({
+    await blogApi.addComment({
       postId: post.id,
       parentId,
       content: commentContent.trim(),
@@ -61,14 +61,14 @@ export default function PostDetail({
     if (!confirmState) return
 
     if (confirmState.type === 'delete-comment' && confirmState.commentId) {
-      await mockBlogApi.deleteComment(post.id, confirmState.commentId)
+      await blogApi.deleteComment(post.id, confirmState.commentId)
       setConfirmState(null)
       onUpdate()
       return
     }
 
     if (confirmState.type === 'delete-post') {
-      await mockBlogApi.deletePost(post.id)
+      await blogApi.deletePost(post.id)
       setConfirmState(null)
       await onDelete()
     }
@@ -90,7 +90,7 @@ export default function PostDetail({
         key={comment.id}
         className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} space-y-4`}
       >
-        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+        <div className="rounded-lg border border-white/12 bg-white/[0.03] p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
               <span className="text-white font-medium">{comment.author}</span>
@@ -100,7 +100,7 @@ export default function PostDetail({
             </div>
             <button
               onClick={() => handleDeleteComment(comment.id)}
-              className="text-white/40 hover:text-red-400 transition-colors"
+              className="text-white/40 hover:text-red-300 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -110,7 +110,7 @@ export default function PostDetail({
 
           <button
             onClick={() => setReplyTo(isReplyingTo ? null : comment.id)}
-            className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
+            className="text-sm text-white/65 hover:text-white/85 transition-colors"
           >
             {isReplyingTo ? 'Cancel' : 'Reply'}
           </button>
@@ -129,12 +129,12 @@ export default function PostDetail({
                     handleAddComment(comment.id)
                   }
                 }}
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
               />
               <button
                 onClick={() => handleAddComment(comment.id)}
                 disabled={submitting}
-                className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-2 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -154,7 +154,7 @@ export default function PostDetail({
 
   return (
     <motion.div
-      className="min-h-screen p-8"
+      className="min-h-screen bg-black p-8"
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -169,7 +169,7 @@ export default function PostDetail({
             value={tokenInput}
             onChange={(e) => setTokenInput(e.target.value)}
             placeholder="Enter write token"
-            className="mt-4 w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500"
+            className="mt-4 w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
           />
         }
         actions={
@@ -186,7 +186,7 @@ export default function PostDetail({
             <button
               onClick={handleSaveWriteToken}
               disabled={!tokenInput.trim()}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors disabled:opacity-50"
+              className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
             >
               Save
             </button>
@@ -218,7 +218,7 @@ export default function PostDetail({
           </>
         }
       />
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto max-w-4xl">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
           <button
@@ -232,7 +232,7 @@ export default function PostDetail({
           <div className="flex items-center gap-2">
             <button
               onClick={onEdit}
-              className="flex items-center gap-2 px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white transition-colors"
             >
               <Pencil className="w-4 h-4" />
               Edit
@@ -253,7 +253,7 @@ export default function PostDetail({
           <h1 className="text-4xl font-bold text-white mb-6">{post.title}</h1>
 
           {/* 메타 정보 */}
-          <div className="flex items-center gap-6 mb-8 text-white/60">
+          <div className="mb-8 flex items-center gap-6 border-b border-white/12 pb-6 text-white/60">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="text-sm">
@@ -266,7 +266,7 @@ export default function PostDetail({
                 <Tag className="w-4 h-4" />
                 <div className="flex gap-2">
                   {post.tags.map((tag) => (
-                    <span key={tag} className="text-sm text-cyan-400">
+                    <span key={tag} className="text-sm text-white/75">
                       #{tag}
                     </span>
                   ))}
@@ -309,12 +309,12 @@ export default function PostDetail({
                   }
                 }}
                 disabled={replyTo !== null}
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500 transition-colors disabled:opacity-50"
+                className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50"
               />
               <button
                 onClick={() => handleAddComment()}
                 disabled={submitting || replyTo !== null}
-                className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="rounded-lg border border-white/20 bg-white px-6 py-3 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
               >
                 <Send className="w-5 h-5" />
               </button>

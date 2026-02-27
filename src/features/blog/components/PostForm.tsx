@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { mockBlogApi } from '@/services/mockBlogApi'
+import { blogApi } from '@/services/blogApi'
 import type { Post } from '@/types/blog'
 import Modal from '@/components/design/Modal'
 
@@ -59,13 +59,13 @@ export default function PostForm({
 
     setSaving(true)
     if (isEditMode && initialPost) {
-      await mockBlogApi.updatePost(initialPost.id, {
+      await blogApi.updatePost(initialPost.id, {
         title: title.trim(),
         content: content.trim(),
         tags,
       })
     } else {
-      await mockBlogApi.createPost({
+      await blogApi.createPost({
         title: title.trim(),
         content: content.trim(),
         tags,
@@ -89,7 +89,7 @@ export default function PostForm({
         actions={
           <button
             onClick={() => setValidationMessage(null)}
-            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+            className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors"
           >
             OK
           </button>
@@ -109,9 +109,9 @@ export default function PostForm({
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-lg border border-white/20 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Save className="w-5 h-5" />
+            <Save className="w-4 h-4" />
             {saving ? 'Saving...' : isEditMode ? 'Update' : 'Save'}
           </button>
         </div>
@@ -138,11 +138,11 @@ export default function PostForm({
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="flex-1 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
               />
               <button
                 onClick={handleAddTag}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                className="rounded-lg border border-white/20 px-4 py-2 text-white/85 hover:bg-white/10 transition-colors"
               >
                 Add
               </button>
@@ -154,7 +154,7 @@ export default function PostForm({
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-2 px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm"
+                    className="flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.03] px-3 py-1 text-sm text-white/75"
                   >
                     #{tag}
                     <button
@@ -175,7 +175,7 @@ export default function PostForm({
               placeholder="Write your content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full min-h-[400px] bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+              className="min-h-[400px] w-full resize-none rounded-lg border border-white/15 bg-white/[0.03] px-6 py-4 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
             />
           </div>
         </div>

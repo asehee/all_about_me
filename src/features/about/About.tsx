@@ -1,7 +1,6 @@
 import { User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '@/components/design/BackButton'
-import SectionHeader from '@/components/design/SectionHeader'
 import PageShell from '@/components/design/PageShell'
 
 export default function About() {
@@ -11,63 +10,71 @@ export default function About() {
       period: '2024.06 - Present',
       company: 'Com2us Coporation',
       role: 'Software Developer',
-      description:
-        'write something here',
     },
     {
       period: '2022.01 - 2024.06',
       company: 'CAiTORY',
       role: 'Software Developer',
-      description:
-        'write something here',
     },
   ]
   const skills = ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Node.js', 'Cloudflare']
 
   return (
-    <PageShell icon={User}>
+    <PageShell icon={User} contentClassName="bg-black">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <BackButton label="Home" onClick={() => navigate('/')} />
         </div>
 
-        <SectionHeader
-          title="About Me"
-          subtitle="Career timeline and skills."
-          accentClassName="from-cyan-500 to-blue-500"
-        />
+        <header>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/45">About</p>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
+            Career and capabilities.
+          </h1>
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/62 md:text-base">
+            A concise timeline of roles and the technologies I use to deliver products.
+          </p>
+        </header>
 
-        <section className="relative">
-          <div className="absolute left-[11.5px] top-0 z-0 h-full w-px bg-gradient-to-b from-cyan-400/40 via-blue-400/30 to-transparent" />
+        <section className="mt-14">
+          <div className="relative">
+            <div className="absolute bottom-2 left-3 top-2 w-px -translate-x-1/2 bg-white/12" />
+            <div className="absolute bottom-2 left-3 top-2 w-px -translate-x-1/2 bg-gradient-to-b from-white/70 via-white/45 to-white/25" />
 
-          <div className="space-y-10">
-            {experiences.map((item) => (
-              <article key={item.company} className="grid grid-cols-[24px_minmax(0,1fr)] gap-4">
-                <div className="relative z-10 flex justify-center pt-2">
-                  <div className="h-3 w-3 rounded-full bg-cyan-600 shadow-[0_0_0_6px_rgba(8,145,178,0.32)]" />
-                </div>
-                <div>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-cyan-300/90">
-                    {item.period}
-                  </p>
-                  <h3 className="mt-1 text-2xl font-semibold text-white">{item.company}</h3>
-                  <p className="mt-1 text-sm text-blue-200">{item.role}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-white/70">
-                    {item.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+            <div className="space-y-10">
+              {experiences.map((item) => (
+                <article key={item.company} className="relative pl-14">
+                  <span className="absolute left-3 top-3.5 z-10 h-3 w-3 -translate-x-1/2">
+                    <span className="absolute inset-0 rounded-full border border-white/45 bg-black shadow-[0_0_0_3px_rgba(255,255,255,0.06)]" />
+                    <span className="absolute inset-0 rounded-full border border-white/30 animate-[ping_3s_ease-out_infinite]" />
+                  </span>
+
+                  <div className="pb-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.12em] text-white/45">
+                          {item.period}
+                        </p>
+                        <h2 className="mt-2 text-2xl font-medium text-white md:text-[2rem]">
+                          {item.company}
+                        </h2>
+                        <p className="mt-1 text-sm text-white/68">{item.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold text-white">Skills</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <h3 className="text-xs uppercase tracking-[0.18em] text-white/45">Skills</h3>
+          <div className="mt-4 flex flex-wrap gap-2.5">
             {skills.map((skill) => (
               <span
                 key={skill}
-                className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-100"
+                className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white/78"
               >
                 {skill}
               </span>
