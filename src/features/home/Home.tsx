@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 
@@ -26,9 +26,42 @@ const menuItems = [
   },
 ]
 
+function useTypewriter(
+  text: string,
+  typingMs = 90,
+  deletingMs = 55,
+  holdMs = 1400
+) {
+  const [value, setValue] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    let timer: number
+
+    if (!isDeleting && value.length < text.length) {
+      timer = window.setTimeout(() => {
+        setValue(text.slice(0, value.length + 1))
+      }, typingMs)
+    } else if (!isDeleting && value.length === text.length) {
+      timer = window.setTimeout(() => setIsDeleting(true), holdMs)
+    } else if (isDeleting && value.length > 0) {
+      timer = window.setTimeout(() => {
+        setValue(text.slice(0, value.length - 1))
+      }, deletingMs)
+    } else {
+      timer = window.setTimeout(() => setIsDeleting(false), 500)
+    }
+
+    return () => window.clearTimeout(timer)
+  }, [value, isDeleting, text, typingMs, deletingMs, holdMs])
+
+  return value
+}
+
 export default function Home() {
   const navigate = useNavigate()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const typedLogging = useTypewriter('(...logging)')
 
   return (
     <motion.div
@@ -52,7 +85,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.05 }}
         >
-          hee.dance
+          hee {typedLogging}
+          <span className="ml-0.5 inline-block animate-pulse text-white/75">|</span>
         </motion.h1>
         <motion.p
           className="mt-6 max-w-2xl text-center text-sm leading-relaxed text-white/62 md:text-base"
@@ -60,7 +94,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.12 }}
         >
-          Software developer. Building products, writing notes, and sharing ideas.
+          Human-centered problems. Practical solutions
         </motion.p>
 
         <section className="mt-12 w-full max-w-3xl">
