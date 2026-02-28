@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PageShell from '@/components/design/PageShell'
 import BackButton from '@/components/design/BackButton'
-import { GitHub } from 'lucide-react'
+import { Github } from 'lucide-react'
 
 export default function GithubLab() {
   const [url, setUrl] = useState('')
@@ -29,7 +29,7 @@ export default function GithubLab() {
   }
 
   return (
-    <PageShell icon={GitHub} contentClassName="bg-black">
+    <PageShell icon={Github} contentClassName="bg-black">
       <BackButton label="Labs" onClick={() => history.back()} className="mb-6" />
       <h1 className="text-3xl font-semibold">GitHub Repo 분석</h1>
       <div className="space-y-4">
