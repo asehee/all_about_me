@@ -18,6 +18,11 @@ export default function Etc() {
       title: 'Reference archive',
       description: 'External links and snippets worth revisiting.',
     },
+    {
+      title: 'GitHub repo 분석',
+      description: 'URL을 입력하면 서버가 컨텍스트를 수집하고 LLM이 리포트를 만들어 줍니다.',
+      link: '/etc/github',
+    },
   ]
 
   return (
@@ -39,8 +44,8 @@ export default function Etc() {
 
         <section className="mt-14">
           <div className="space-y-1 border-t border-white/12">
-            {labEntries.map((item, index) => (
-              <article key={item.title} className="border-b border-white/12 py-5 md:py-6">
+            {labEntries.map((item, index) => {
+              const content = (
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="text-2xl font-medium text-white md:text-[2rem]">
@@ -52,8 +57,17 @@ export default function Etc() {
                   </div>
                   <span className="text-xs text-white/35">0{index + 1}</span>
                 </div>
-              </article>
-            ))}
+              )
+              return (
+                <article key={item.title} className="border-b border-white/12 py-5 md:py-6">
+                  {item.link ? (
+                    <a href={item.link}>{content}</a>
+                  ) : (
+                    content
+                  )}
+                </article>
+              )
+            })}
           </div>
         </section>
       </div>

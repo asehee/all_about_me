@@ -2,6 +2,7 @@ import { ApiError, notFound } from './lib/errors'
 import { createContext, errorResponse, logRequest, preflight } from './lib/http'
 import { handleCommentsRoutes } from './routes/comments'
 import { handlePostsRoutes } from './routes/posts'
+import { handleGitHubAnalysis } from './routes/githubAnalysis'
 import type { Env } from './types'
 
 const extractUserId = (request: Request): string | null =>
@@ -31,6 +32,13 @@ export default {
       if (commentResponse) {
         logRequest(ctx, commentResponse.status, userId)
         return commentResponse
+      }
+
+      // custom GitHub analysis endpoint
+      const githubResponse = await handleGitHubAnalysis(ctx as any)
+      if (githubResponse) {
+        logRequest(ctx, githubResponse.status, userId)
+        return githubResponse
       }
 
       throw notFound()

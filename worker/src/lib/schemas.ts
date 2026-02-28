@@ -81,3 +81,14 @@ export const commentResponseSchema = z.object({
 export type CreatePostInput = z.infer<typeof createPostSchema>
 export type UpdatePostInput = z.infer<typeof updatePostSchema>
 export type CreateCommentInput = z.infer<typeof createCommentSchema>
+
+// minimal typing for GitHub context bundle used by analysis lab
+export type RepoBundle = {
+  repo_url: string
+  repo_meta: Record<string, unknown>
+  readme_md: string
+  tree: Array<{ path: string; type: 'file' | 'dir' }>
+  key_files: Array<{ path: string; content: string }>
+  core_files: Array<{ path: string; content: string }>
+  commit_activity: string
+}
