@@ -7,18 +7,6 @@ export default function Etc() {
   const navigate = useNavigate()
   const labEntries = [
     {
-      title: 'UI studies',
-      description: 'Interaction patterns, transitions, and interface experiments.',
-    },
-    {
-      title: 'Build notes',
-      description: 'Short technical memos from implementation and deployment work.',
-    },
-    {
-      title: 'Reference archive',
-      description: 'External links and snippets worth revisiting.',
-    },
-    {
       title: 'GitHub repo 분석',
       description: 'URL을 입력하면 서버가 컨텍스트를 수집하고 LLM이 리포트를 만들어 줍니다.',
       link: '/etc/github',
@@ -33,12 +21,12 @@ export default function Etc() {
         </div>
 
         <header>
-          <p className="text-xs uppercase tracking-[0.18em] text-white/45">Labs</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/45">Tools</p>
           <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
-            Experiments and notes.
+            Useful developer utilities.
           </h1>
           <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/62 md:text-base">
-            Ongoing ideas, visual tests, and references for future project directions.
+            Handy tools and helpers for various tasks.
           </p>
         </header>
 
