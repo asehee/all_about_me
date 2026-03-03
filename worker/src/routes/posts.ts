@@ -1,6 +1,7 @@
+import { Hono } from 'hono'
 import { authenticateWriteRequest } from '../lib/auth'
 import { createPost, deletePost, getPostById, listPosts, listTags, updatePost } from '../lib/db'
-import { notFound, badRequest, ApiError } from '../lib/errors'
+import { ApiError, badRequest, notFound } from '../lib/errors'
 import { json } from '../lib/http'
 import {
   createPostSchema,
@@ -10,7 +11,7 @@ import {
   updatePostSchema,
 } from '../lib/schemas'
 import { enforceWriteRateLimit } from '../lib/security'
-import type { RequestContext } from '../types'
+import type { HonoAppBindings } from '../types'
 
 const getNumericId = (id: string): number => {
   const parsed = Number(id)
@@ -18,80 +19,92 @@ const getNumericId = (id: string): number => {
   return parsed
 }
 
-export const handlePostsRoutes = async (ctx: RequestContext): Promise<Response | null> => {
-  const { request, url, env } = ctx
-  const { pathname } = url
+const parseJson = async (req: Request): Promise<unknown> => {
+  try {
+    return await req.json()
+  } catch {
+    throw new ApiError(400, 'INVALID_JSON', 'Invalid JSON body')
+  }
+}
 
-  if (request.method === 'GET' && pathname === '/api/posts') {
-    const posts = await listPosts(env.DB)
+export const registerPostsRoutes = (
+  app: Hono<HonoAppBindings>,
+  recordRoute?: (method: string, path: string) => void,
+): void => {
+  recordRoute?.('GET', '/posts')
+  app.get('/posts', async (c) => {
+    const ctx = c.get('requestContext')
+    const posts = await listPosts(ctx.env.DB)
     const body = postsResponseSchema.parse({ posts })
     return json(ctx, body)
-  }
+  })
 
-  if (request.method === 'GET' && /^\/api\/posts\/\d+$/.test(pathname)) {
-    const id = pathname.split('/').at(-1)
-    if (!id) throw notFound()
-
-    const post = await getPostById(env.DB, getNumericId(id))
+  recordRoute?.('GET', '/posts/:id')
+  app.get('/posts/:id', async (c) => {
+    const ctx = c.get('requestContext')
+    const id = c.req.param('id')
+    const post = await getPostById(ctx.env.DB, getNumericId(id))
     if (!post) throw notFound('Post not found')
 
     const body = postResponseSchema.parse({ post })
     return json(ctx, body)
-  }
+  })
 
-  if (request.method === 'POST' && pathname === '/api/posts') {
+  recordRoute?.('POST', '/posts')
+  app.post('/posts', async (c) => {
+    const ctx = c.get('requestContext')
     const user = await authenticateWriteRequest(ctx)
-    await enforceWriteRateLimit(env, user, 'posts:write')
+    await enforceWriteRateLimit(ctx.env, user, 'posts:write')
 
-    const rawBody = await request.json()
+    const rawBody = await parseJson(c.req.raw)
     const parsed = createPostSchema.safeParse(rawBody)
     if (!parsed.success) {
       throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid create post payload', parsed.error.flatten())
     }
 
-    const post = await createPost(env.DB, parsed.data, user)
+    const post = await createPost(ctx.env.DB, parsed.data, user)
     const body = postResponseSchema.parse({ post })
     return json(ctx, body, 201)
-  }
+  })
 
-  if (request.method === 'PUT' && /^\/api\/posts\/\d+$/.test(pathname)) {
+  recordRoute?.('PUT', '/posts/:id')
+  app.put('/posts/:id', async (c) => {
+    const ctx = c.get('requestContext')
     const user = await authenticateWriteRequest(ctx)
-    await enforceWriteRateLimit(env, user, 'posts:write')
+    await enforceWriteRateLimit(ctx.env, user, 'posts:write')
 
-    const id = pathname.split('/').at(-1)
-    if (!id) throw notFound()
-
-    const rawBody = await request.json()
+    const id = c.req.param('id')
+    const rawBody = await parseJson(c.req.raw)
     const parsed = updatePostSchema.safeParse(rawBody)
     if (!parsed.success) {
       throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid update post payload', parsed.error.flatten())
     }
 
-    const post = await updatePost(env.DB, getNumericId(id), parsed.data)
+    const post = await updatePost(ctx.env.DB, getNumericId(id), parsed.data)
     if (!post) throw notFound('Post not found')
 
     const body = postResponseSchema.parse({ post })
     return json(ctx, body)
-  }
+  })
 
-  if (request.method === 'DELETE' && /^\/api\/posts\/\d+$/.test(pathname)) {
+  recordRoute?.('DELETE', '/posts/:id')
+  app.delete('/posts/:id', async (c) => {
+    const ctx = c.get('requestContext')
     const user = await authenticateWriteRequest(ctx)
-    await enforceWriteRateLimit(env, user, 'posts:write')
+    await enforceWriteRateLimit(ctx.env, user, 'posts:write')
 
-    const id = pathname.split('/').at(-1)
-    if (!id) throw notFound()
-
-    const deleted = await deletePost(env.DB, getNumericId(id))
+    const id = c.req.param('id')
+    const deleted = await deletePost(ctx.env.DB, getNumericId(id))
     if (!deleted) throw notFound('Post not found')
 
     return json(ctx, { success: true })
-  }
+  })
 
-  if (request.method === 'GET' && pathname === '/api/tags') {
-    const tags = await listTags(env.DB)
+  recordRoute?.('GET', '/tags')
+  app.get('/tags', async (c) => {
+    const ctx = c.get('requestContext')
+    const tags = await listTags(ctx.env.DB)
     const body = tagsResponseSchema.parse({ tags })
     return json(ctx, body)
-  }
-
-  return null
+  })
 }

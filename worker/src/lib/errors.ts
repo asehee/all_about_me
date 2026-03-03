@@ -31,6 +31,9 @@ export const forbidden = (message = 'Forbidden', details?: unknown) =>
 export const notFound = (message = 'Resource not found') =>
   new ApiError(404, 'NOT_FOUND', message)
 
+export const methodNotAllowed = (allowed: string[]) =>
+  new ApiError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed', { allowed })
+
 export const rateLimited = (message = 'Too many requests', details?: unknown) =>
   new ApiError(429, 'RATE_LIMITED', message, details)
 

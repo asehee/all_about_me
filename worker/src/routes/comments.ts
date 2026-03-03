@@ -1,10 +1,11 @@
+import { Hono } from 'hono'
 import { authenticateWriteRequest } from '../lib/auth'
 import { createComment, softDeleteComment } from '../lib/db'
 import { ApiError, badRequest, notFound } from '../lib/errors'
 import { json } from '../lib/http'
 import { commentResponseSchema, createCommentSchema } from '../lib/schemas'
 import { enforceWriteRateLimit } from '../lib/security'
-import type { RequestContext } from '../types'
+import type { HonoAppBindings } from '../types'
 
 const getNumericId = (id: string): number => {
   const parsed = Number(id)
@@ -12,42 +13,47 @@ const getNumericId = (id: string): number => {
   return parsed
 }
 
-export const handleCommentsRoutes = async (ctx: RequestContext): Promise<Response | null> => {
-  const { request, url, env } = ctx
-  const { pathname } = url
+const parseJson = async (req: Request): Promise<unknown> => {
+  try {
+    return await req.json()
+  } catch {
+    throw new ApiError(400, 'INVALID_JSON', 'Invalid JSON body')
+  }
+}
 
-  if (request.method === 'POST' && pathname === '/api/comments') {
+export const registerCommentsRoutes = (
+  app: Hono<HonoAppBindings>,
+  recordRoute?: (method: string, path: string) => void,
+): void => {
+  recordRoute?.('POST', '/comments')
+  app.post('/comments', async (c) => {
+    const ctx = c.get('requestContext')
     const user = await authenticateWriteRequest(ctx)
-    await enforceWriteRateLimit(env, user, 'comments:write')
+    await enforceWriteRateLimit(ctx.env, user, 'comments:write')
 
-    const rawBody = await request.json()
+    const rawBody = await parseJson(c.req.raw)
     const parsed = createCommentSchema.safeParse(rawBody)
     if (!parsed.success) {
       throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid create comment payload', parsed.error.flatten())
     }
 
-    const comment = await createComment(env.DB, parsed.data, user)
+    const comment = await createComment(ctx.env.DB, parsed.data, user)
     const body = commentResponseSchema.parse({ comment })
     return json(ctx, body, 201)
-  }
+  })
 
-  if (
-    request.method === 'DELETE' &&
-    /^\/api\/posts\/\d+\/comments\/[a-zA-Z0-9_-]+$/.test(pathname)
-  ) {
+  recordRoute?.('DELETE', '/posts/:postId/comments/:commentId')
+  app.delete('/posts/:postId/comments/:commentId', async (c) => {
+    const ctx = c.get('requestContext')
     const user = await authenticateWriteRequest(ctx)
-    await enforceWriteRateLimit(env, user, 'comments:write')
+    await enforceWriteRateLimit(ctx.env, user, 'comments:write')
 
-    const parts = pathname.split('/')
-    const postId = parts[3]
-    const commentId = parts[5]
-    if (!postId || !commentId) throw notFound()
+    const postId = c.req.param('postId')
+    const commentId = c.req.param('commentId')
 
-    const deleted = await softDeleteComment(env.DB, getNumericId(postId), commentId)
+    const deleted = await softDeleteComment(ctx.env.DB, getNumericId(postId), commentId)
     if (!deleted) throw notFound('Comment not found')
 
     return json(ctx, { success: true })
-  }
-
-  return null
+  })
 }

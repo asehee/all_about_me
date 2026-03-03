@@ -25,3 +25,14 @@ export interface RequestContext {
   startTime: number
   allowedOrigin: string | null
 }
+
+export interface HonoVariables {
+  requestContext: RequestContext
+  userId: string | null
+  logSkip?: boolean
+}
+
+export interface HonoAppBindings {
+  Bindings: Env
+  Variables: HonoVariables
+}
