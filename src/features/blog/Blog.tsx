@@ -226,8 +226,11 @@ export default function Blog() {
             </p>
           </header>
 
-          <div className="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+          <div className="mt-10 grid gap-8 lg:gap-10 lg:grid-cols-[220px_minmax(0,1fr)]">
             <div className="order-2 lg:order-1">
+              <div className="mb-8 flex min-h-[56px] items-center border-b border-white/12 pb-4">
+                <p className="text-sm text-white/60">Tags</p>
+              </div>
               <TagList
                 tags={tags}
                 selectedTag={selectedTag}
@@ -236,20 +239,20 @@ export default function Blog() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="mb-8 flex min-h-[42px] flex-wrap items-center justify-between gap-4 border-b border-white/12 pb-4">
+              <div className="mb-8 flex min-h-[56px] flex-wrap items-center justify-between gap-3 border-b border-white/12 pb-4 lg:flex-nowrap">
                 <p className="text-sm text-white/60">
                   {selectedTag ? `Filter: #${selectedTag}` : 'All posts'}
                 </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={hasWriteToken ? handleClearWriteToken : openTokenInputModal}
-                    className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                    className="h-8 whitespace-nowrap rounded-lg border border-white/20 px-3 text-xs text-white/80 hover:bg-white/10 transition-colors"
                   >
                     {hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
                   </button>
                   <button
                     onClick={handleCreatePost}
-                    className="flex items-center gap-2 rounded-lg border border-white/20 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-white/90 transition-colors"
+                    className="flex h-8 items-center gap-2 whitespace-nowrap rounded-lg border border-white/20 bg-white px-3.5 text-xs font-medium text-black hover:bg-white/90 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     New
