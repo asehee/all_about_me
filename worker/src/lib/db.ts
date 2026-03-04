@@ -9,6 +9,7 @@ interface PostRow {
   content: string
   slug: string
   status: 'draft' | 'published'
+  type: 'blog' | 'article'
   published_at: string | null
   author: string
   created_at: string
@@ -171,6 +172,7 @@ const toPost = async (db: D1Database, row: PostRow): Promise<Post> => {
     content: row.content,
     slug: row.slug,
     status: row.status,
+    type: row.type,
     publishedAt: toIso(row.published_at),
     tags,
     author: row.author,
@@ -180,14 +182,14 @@ const toPost = async (db: D1Database, row: PostRow): Promise<Post> => {
   }
 }
 
-export const listPosts = async (db: D1Database): Promise<Post[]> => {
-  const rows = await db
-    .prepare(
-      `SELECT id, title, content, slug, status, published_at, author, created_at, updated_at
-       FROM posts
-       ORDER BY datetime(created_at) DESC`,
-    )
-    .all<PostRow>()
+export const listPosts = async (db: D1Database, type?: PostRow['type']): Promise<Post[]> => {
+  const baseQuery =
+    `SELECT id, title, content, slug, status, type, published_at, author, created_at, updated_at
+     FROM posts` +
+    (type ? ' WHERE type = ?' : '') +
+    ' ORDER BY datetime(created_at) DESC'
+  const statement = db.prepare(baseQuery)
+  const rows = type ? await statement.bind(type).all<PostRow>() : await statement.all<PostRow>()
 
   return Promise.all((rows.results ?? []).map((row) => toPost(db, row)))
 }
@@ -195,7 +197,7 @@ export const listPosts = async (db: D1Database): Promise<Post[]> => {
 export const getPostById = async (db: D1Database, postId: number): Promise<Post | null> => {
   const row = await db
     .prepare(
-      `SELECT id, title, content, slug, status, published_at, author, created_at, updated_at
+      `SELECT id, title, content, slug, status, type, published_at, author, created_at, updated_at
        FROM posts
        WHERE id = ?`,
     )
@@ -213,16 +215,27 @@ export const createPost = async (
 ): Promise<Post> => {
   const tags = normalizeTags(payload.tags)
   const status = payload.status ?? 'published'
+  const type = payload.type ?? 'blog'
   const publishedAt = status === 'published' ? payload.publishedAt ?? new Date().toISOString() : null
   const now = new Date().toISOString()
   const uniqueSlug = await ensureUniqueSlug(db, slugify(payload.title))
 
   const inserted = await db
     .prepare(
-      `INSERT INTO posts(title, content, slug, status, published_at, author, created_at, updated_at)
-       VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO posts(title, content, slug, status, type, published_at, author, created_at, updated_at)
+       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(payload.title, payload.content, uniqueSlug, status, publishedAt, user.name ?? user.id, now, now)
+    .bind(
+      payload.title,
+      payload.content,
+      uniqueSlug,
+      status,
+      type,
+      publishedAt,
+      user.name ?? user.id,
+      now,
+      now,
+    )
     .run()
 
   const postId = Number(inserted.meta.last_row_id)
@@ -240,7 +253,7 @@ export const updatePost = async (
 ): Promise<Post | null> => {
   const current = await db
     .prepare(
-      `SELECT id, title, content, slug, status, published_at, author, created_at, updated_at
+      `SELECT id, title, content, slug, status, type, published_at, author, created_at, updated_at
        FROM posts
        WHERE id = ?`,
     )
@@ -258,6 +271,7 @@ export const updatePost = async (
         ? current.published_at ?? new Date().toISOString()
         : payload.publishedAt
       : null
+  const nextType = payload.type ?? current.type
 
   const nextSlug =
     payload.title !== undefined
@@ -267,10 +281,19 @@ export const updatePost = async (
   await db
     .prepare(
       `UPDATE posts
-       SET title = ?, content = ?, slug = ?, status = ?, published_at = ?, updated_at = ?
+       SET title = ?, content = ?, slug = ?, status = ?, type = ?, published_at = ?, updated_at = ?
        WHERE id = ?`,
     )
-    .bind(nextTitle, nextContent, nextSlug, nextStatus, nextPublishedAt, new Date().toISOString(), postId)
+    .bind(
+      nextTitle,
+      nextContent,
+      nextSlug,
+      nextStatus,
+      nextType,
+      nextPublishedAt,
+      new Date().toISOString(),
+      postId,
+    )
     .run()
 
   if (payload.tags) {
@@ -299,17 +322,16 @@ export const deletePost = async (db: D1Database, postId: number): Promise<boolea
   return true
 }
 
-export const listTags = async (db: D1Database): Promise<string[]> => {
-  const result = await db
-    .prepare(
-      `SELECT t.name
-       FROM tags t
-       WHERE EXISTS (
-         SELECT 1 FROM post_tags pt WHERE pt.tag_id = t.id
-       )
-       ORDER BY t.name ASC`,
-    )
-    .all<{ name: string }>()
+export const listTags = async (db: D1Database, type?: PostRow['type']): Promise<string[]> => {
+  const baseQuery =
+    `SELECT DISTINCT t.name
+     FROM tags t
+     JOIN post_tags pt ON pt.tag_id = t.id
+     JOIN posts p ON p.id = pt.post_id` +
+    (type ? ' WHERE p.type = ?' : '') +
+    ' ORDER BY t.name ASC'
+  const statement = db.prepare(baseQuery)
+  const result = type ? await statement.bind(type).all<{ name: string }>() : await statement.all<{ name: string }>()
   return (result.results ?? []).map((row) => row.name)
 }
 
@@ -336,19 +358,21 @@ export const createComment = async (
 
   const id = `c${Date.now()}${Math.floor(Math.random() * 1000)}`
   const createdAt = new Date().toISOString()
+  const author = payload.author.trim()
+
   await db
     .prepare(
       `INSERT INTO comments(id, post_id, parent_id, author, content, created_at, deleted_at)
        VALUES(?, ?, ?, ?, ?, ?, NULL)`,
     )
-    .bind(id, postId, payload.parentId, user.name ?? user.id, payload.content, createdAt)
+    .bind(id, postId, payload.parentId, author, payload.content, createdAt)
     .run()
 
   return {
     id,
     postId: payload.postId,
     parentId: payload.parentId,
-    author: user.name ?? user.id,
+    author,
     content: payload.content,
     createdAt,
     replies: [],

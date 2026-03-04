@@ -14,6 +14,7 @@ export interface Post {
   content: string
   slug: string
   status: 'draft' | 'published'
+  type: 'blog' | 'article'
   publishedAt: string | null
   tags: string[]
   author: string
@@ -28,6 +29,7 @@ export interface CreatePostDTO {
   tags?: string[]
   status?: 'draft' | 'published'
   publishedAt?: string | null
+  type?: 'blog' | 'article'
 }
 
 export interface UpdatePostDTO {
@@ -36,10 +38,12 @@ export interface UpdatePostDTO {
   tags?: string[]
   status?: 'draft' | 'published'
   publishedAt?: string | null
+  type?: 'blog' | 'article'
 }
 
 export interface CreateCommentDTO {
   postId: string
   parentId: string | null
+  author: string
   content: string
 }

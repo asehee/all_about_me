@@ -1,5 +1,5 @@
 import { BookOpen, Plus } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { Post } from '@/types/blog'
 import { blogApi, writeTokenManager } from '@/services/blogApi'
@@ -13,6 +13,8 @@ import Modal from '@/components/design/Modal'
 
 export default function Blog() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isArticles = location.pathname.startsWith('/articles')
   const [posts, setPosts] = useState<Post[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
@@ -37,9 +39,10 @@ export default function Blog() {
     setLoading(true)
     setError(null)
     try {
+      const postType = isArticles ? 'article' : 'blog'
       const [fetchedPosts, fetchedTags] = await Promise.all([
-        blogApi.getPosts(),
-        blogApi.getTags(),
+        blogApi.getPosts({ type: postType }),
+        blogApi.getTags({ type: postType }),
       ])
       setPosts(fetchedPosts)
       setTags(fetchedTags)
@@ -207,6 +210,7 @@ export default function Blog() {
         <PostForm
           mode={editingPost ? 'edit' : 'create'}
           initialPost={editingPost}
+          defaultType={isArticles ? 'article' : 'blog'}
           onBack={handleBackToList}
           onSuccess={handlePostCreated}
         />
@@ -217,19 +221,26 @@ export default function Blog() {
           </div>
 
           <header>
-            <p className="text-xs uppercase tracking-[0.18em] text-white/45">Journal</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+              {isArticles ? 'Reading' : 'Journal'}
+            </p>
             <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
-              Notes 
+              {isArticles ? 'Articles' : 'Notes'}
             </h1>
             <p className="mt-5 text-sm text-white/62 md:text-base">
-              {filteredPosts.length} posts
+              {filteredPosts.length} {isArticles ? 'articles' : 'posts'}
             </p>
+            {isArticles ? (
+              <p className="mt-3 text-sm text-white/55 md:text-base">
+                Saved reads, highlights, and quick reviews.
+              </p>
+            ) : null}
           </header>
 
           <div className="mt-10 grid gap-8 lg:gap-10 lg:grid-cols-[220px_minmax(0,1fr)]">
             <div className="order-2 lg:order-1">
               <div className="mb-8 flex min-h-[56px] items-center border-b border-white/12 pb-4">
-                <p className="text-sm text-white/60">Tags</p>
+                <p className="text-sm text-white/60">{isArticles ? 'Topics' : 'Tags'}</p>
               </div>
               <TagList
                 tags={tags}
@@ -241,7 +252,11 @@ export default function Blog() {
             <div className="order-1 lg:order-2">
               <div className="mb-8 flex min-h-[56px] flex-wrap items-center justify-between gap-3 border-b border-white/12 pb-4 lg:flex-nowrap">
                 <p className="text-sm text-white/60">
-                  {selectedTag ? `Filter: #${selectedTag}` : 'All posts'}
+                  {selectedTag
+                    ? `Filter: #${selectedTag}`
+                    : isArticles
+                      ? 'All articles'
+                      : 'All posts'}
                 </p>
                 <div className="flex items-center gap-2">
                   <button
@@ -255,7 +270,7 @@ export default function Blog() {
                     className="flex h-8 items-center gap-2 whitespace-nowrap rounded-lg border border-white/20 bg-white px-3.5 text-xs font-medium text-black hover:bg-white/90 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    New
+                    {isArticles ? 'New Scrap' : 'New'}
                   </button>
                 </div>
               </div>
@@ -264,7 +279,11 @@ export default function Blog() {
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by title, content, author"
+                  placeholder={
+                    isArticles
+                      ? 'Search by title, source, author'
+                      : 'Search by title, content, author'
+                  }
                   className="w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
                 />
               </div>

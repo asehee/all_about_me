@@ -20,6 +20,11 @@ export default function PostDetail({
   onUpdate,
   onDelete,
 }: PostDetailProps) {
+  const normalizedContent = post.content.replace(
+    /<br\s*\/?>\s*<br\s*\/?>/g,
+    '</p><p>',
+  )
+  const [commentAuthor, setCommentAuthor] = useState('')
   const [commentContent, setCommentContent] = useState('')
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -31,12 +36,13 @@ export default function PostDetail({
   const [tokenInput, setTokenInput] = useState('')
 
   const handleAddComment = async (parentId: string | null = null) => {
-    if (!commentContent.trim()) return
+    if (!commentAuthor.trim() || !commentContent.trim()) return
 
     setSubmitting(true)
     await blogApi.addComment({
       postId: post.id,
       parentId,
+      author: commentAuthor.trim(),
       content: commentContent.trim(),
     })
     setCommentContent('')
@@ -118,6 +124,13 @@ export default function PostDetail({
           {/* 답글 작성 폼 */}
           {isReplyingTo && (
             <div className="mt-4 flex gap-2">
+              <input
+                type="text"
+                placeholder="Nickname"
+                value={commentAuthor}
+                onChange={(e) => setCommentAuthor(e.target.value)}
+                className="w-40 rounded-lg border border-white/20 bg-white/[0.03] px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+              />
               <input
                 type="text"
                 placeholder="Write a reply"
@@ -277,9 +290,10 @@ export default function PostDetail({
 
           {/* 내용 */}
           <div className="prose prose-invert max-w-none">
-            <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
-              {post.content}
-            </p>
+            <div
+              className="rich-content text-white/80"
+              dangerouslySetInnerHTML={{ __html: normalizedContent }}
+            />
           </div>
         </article>
 
@@ -294,30 +308,42 @@ export default function PostDetail({
 
           {/* 댓글 작성 */}
           <div className="mb-8">
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
               <input
                 type="text"
-                placeholder="Write a comment"
-                value={replyTo === null ? commentContent : ''}
+                placeholder="Nickname"
+                value={replyTo === null ? commentAuthor : ''}
                 onChange={(e) => {
-                  if (replyTo === null) setCommentContent(e.target.value)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey && replyTo === null) {
-                    e.preventDefault()
-                    handleAddComment()
-                  }
+                  if (replyTo === null) setCommentAuthor(e.target.value)
                 }}
                 disabled={replyTo !== null}
-                className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50"
+                className="w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50 md:w-56"
               />
-              <button
-                onClick={() => handleAddComment()}
-                disabled={submitting || replyTo !== null}
-                className="rounded-lg border border-white/20 bg-white px-6 py-3 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
-              >
-                <Send className="w-5 h-5" />
-              </button>
+              <div className="flex flex-1 gap-2">
+                <input
+                  type="text"
+                  placeholder="Write a comment"
+                  value={replyTo === null ? commentContent : ''}
+                  onChange={(e) => {
+                    if (replyTo === null) setCommentContent(e.target.value)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && replyTo === null) {
+                      e.preventDefault()
+                      handleAddComment()
+                    }
+                  }}
+                  disabled={replyTo !== null}
+                  className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50"
+                />
+                <button
+                  onClick={() => handleAddComment()}
+                  disabled={submitting || replyTo !== null}
+                  className="rounded-lg border border-white/20 bg-white px-6 py-3 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 

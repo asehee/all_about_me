@@ -28,12 +28,9 @@ export default function About() {
 
         <header>
           <p className="text-xs uppercase tracking-[0.18em] text-white/45">About</p>
-          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
-            Career and capabilities.
-          </h1>
-          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/62 md:text-base">
-            A concise timeline of roles and the technologies I use to deliver products.
-          </p>
+          <h3 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-6xl">
+            Career
+          </h3>
         </header>
 
         <section className="mt-14">

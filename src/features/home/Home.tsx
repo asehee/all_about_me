@@ -6,23 +6,23 @@ import { ArrowUpRight } from 'lucide-react'
 const menuItems = [
   {
     id: 'about',
-    label: 'About',
-    description: 'Who I am, what I value, and how I work.',
+    label: 'Career',
+    description: 'Who I am',
   },
   {
     id: 'blog',
-    label: 'Journal',
-    description: 'Writing, notes, and ideas in motion.',
+    label: 'Blog',
+    description: 'What I know about software',
   },
   {
-    id: 'profile',
-    label: 'Work',
-    description: 'Products, execution, and outcomes.',
+    id: 'articles',
+    label: 'Articles',
+    description: 'What I read about software',
   },
   {
     id: 'etc',
-    label: 'Labs',
-    description: 'Experiments and side explorations.',
+    label: 'utils',
+    description: 'Random utilities and experiments',
   },
 ]
 

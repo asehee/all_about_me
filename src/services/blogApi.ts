@@ -80,8 +80,9 @@ export const writeTokenManager = {
 }
 
 export const blogApi = {
-  async getPosts(): Promise<Post[]> {
-    const data = await request<PostsResponse>('/posts')
+  async getPosts(options?: { type?: 'blog' | 'article' }): Promise<Post[]> {
+    const params = options?.type ? `?type=${encodeURIComponent(options.type)}` : ''
+    const data = await request<PostsResponse>(`/posts${params}`)
     return data.posts
   },
 
@@ -128,13 +129,14 @@ export const blogApi = {
     }
   },
 
-  async getTags(): Promise<string[]> {
-    const data = await request<TagsResponse>('/tags')
+  async getTags(options?: { type?: 'blog' | 'article' }): Promise<string[]> {
+    const params = options?.type ? `?type=${encodeURIComponent(options.type)}` : ''
+    const data = await request<TagsResponse>(`/tags${params}`)
     return data.tags
   },
 
-  async getPostsByTag(tag: string): Promise<Post[]> {
-    const allPosts = await this.getPosts()
+  async getPostsByTag(tag: string, options?: { type?: 'blog' | 'article' }): Promise<Post[]> {
+    const allPosts = await this.getPosts(options)
     return allPosts.filter((post) => post.tags.includes(tag))
   },
 

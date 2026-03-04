@@ -1,12 +1,14 @@
 import { z } from 'zod'
 
 const postStatusSchema = z.enum(['draft', 'published'])
+const postTypeSchema = z.enum(['blog', 'article'])
 
 export const createPostSchema = z.object({
   title: z.string().trim().min(1).max(180),
   content: z.string().trim().min(1).max(20000),
   tags: z.array(z.string().trim().min(1).max(40)).max(20).optional().default([]),
   status: postStatusSchema.optional().default('published'),
+  type: postTypeSchema.optional().default('blog'),
   publishedAt: z.string().datetime().nullable().optional(),
 })
 
@@ -16,6 +18,7 @@ export const updatePostSchema = z
     content: z.string().trim().min(1).max(20000).optional(),
     tags: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
     status: postStatusSchema.optional(),
+    type: postTypeSchema.optional(),
     publishedAt: z.string().datetime().nullable().optional(),
   })
   .refine((value) => Object.keys(value).length > 0, {
@@ -25,6 +28,7 @@ export const updatePostSchema = z
 export const createCommentSchema = z.object({
   postId: z.string().regex(/^\d+$/),
   parentId: z.string().min(1).nullable(),
+  author: z.string().trim().min(1).max(80),
   content: z.string().trim().min(1).max(2000),
 })
 
@@ -54,6 +58,7 @@ export const postSchema = z.object({
   content: z.string(),
   slug: z.string(),
   status: postStatusSchema,
+  type: postTypeSchema,
   publishedAt: z.string().datetime().nullable(),
   tags: z.array(z.string()),
   author: z.string(),

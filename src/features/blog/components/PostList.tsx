@@ -6,6 +6,9 @@ interface PostListProps {
   onPostClick: (post: Post) => void
 }
 
+const stripHtml = (value: string): string =>
+  value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+
 export default function PostList({ posts, onPostClick }: PostListProps) {
   if (posts.length === 0) {
     return (
@@ -44,7 +47,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
                 {post.title}
               </h3>
               <p className="mt-1 text-sm text-white/50 line-clamp-1">
-                {post.content}
+                {stripHtml(post.content)}
               </p>
               {post.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">

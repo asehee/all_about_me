@@ -19,6 +19,12 @@ const getNumericId = (id: string): number => {
   return parsed
 }
 
+const parsePostType = (value: string | undefined): 'blog' | 'article' | undefined => {
+  if (!value) return undefined
+  if (value === 'blog' || value === 'article') return value
+  throw badRequest('Invalid post type')
+}
+
 const parseJson = async (req: Request): Promise<unknown> => {
   try {
     return await req.json()
@@ -34,7 +40,8 @@ export const registerPostsRoutes = (
   recordRoute?.('GET', '/posts')
   app.get('/posts', async (c) => {
     const ctx = c.get('requestContext')
-    const posts = await listPosts(ctx.env.DB)
+    const type = parsePostType(c.req.query('type'))
+    const posts = await listPosts(ctx.env.DB, type)
     const body = postsResponseSchema.parse({ posts })
     return json(ctx, body)
   })
@@ -103,7 +110,8 @@ export const registerPostsRoutes = (
   recordRoute?.('GET', '/tags')
   app.get('/tags', async (c) => {
     const ctx = c.get('requestContext')
-    const tags = await listTags(ctx.env.DB)
+    const type = parsePostType(c.req.query('type'))
+    const tags = await listTags(ctx.env.DB, type)
     const body = tagsResponseSchema.parse({ tags })
     return json(ctx, body)
   })
