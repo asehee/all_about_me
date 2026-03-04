@@ -100,10 +100,10 @@ export default function PostForm({
     setTitle(initialPost?.title ?? '')
     setTags(initialPost?.tags ?? [])
     if (editor && initialPost) {
-      editor.commands.setContent(initialPost.content ?? '', false)
+      editor.commands.setContent(initialPost.content ?? '', { emitUpdate: false })
     }
     if (editor && !initialPost) {
-      editor.commands.setContent('', false)
+      editor.commands.setContent('', { emitUpdate: false })
     }
   }, [initialPost, editor])
 
