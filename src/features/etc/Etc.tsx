@@ -2,6 +2,7 @@ import { Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '@/components/design/BackButton'
 import PageShell from '@/components/design/PageShell'
+import SEO from '@/components/SEO'
 
 export default function Etc() {
   const navigate = useNavigate()
@@ -14,7 +15,14 @@ export default function Etc() {
   ]
 
   return (
-    <PageShell icon={Sparkles} contentClassName="bg-black">
+    <>
+      <SEO
+        title="Utils - hee.dance"
+        description="Useful developer utilities and tools. GitHub repository analysis, and other handy helpers for various tasks."
+        keywords="developer tools, utilities, GitHub analysis, developer resources"
+        url="https://hee.dance/etc"
+      />
+      <PageShell icon={Sparkles} contentClassName="bg-black">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <BackButton label="Home" onClick={() => navigate('/')} />
@@ -60,5 +68,6 @@ export default function Etc() {
         </section>
       </div>
     </PageShell>
+    </>
   )
 }

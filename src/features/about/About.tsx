@@ -10,14 +10,41 @@ export default function About() {
       period: '2024.06 - Present',
       company: 'Com2us Coporation',
       role: 'Software Developer',
+      summary: '',
     },
     {
       period: '2022.01 - 2024.06',
       company: 'CAiTORY',
       role: 'Software Developer',
+      summary: '',
     },
   ]
-  const skills = ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Node.js', 'Cloudflare']
+  const skillGroups = [
+    {
+      label: 'Languages',
+      items: ['TypeScript', 'JavaScript', 'JAVA'],
+    },
+    {
+      label: 'Frameworks',
+      items: ['Express', 'NestJS', 'Hono', 'Spring Boot', 'React', 'Next.js'],
+    },
+    {
+      label: 'Infrastructure',
+      items: ['AWS EC2', 'AWS S3', 'CloudFront', 'Docker', 'Nginx'],
+    },
+    {
+      label: 'Serverless',
+      items: ['Cloudflare Workers', 'AWS Lambda'],
+    },
+    {
+      label: 'Tooling',
+      items: ['GitHub Actions', 'Biome', 'ESLint', 'Wrangler'],
+    },
+    {
+      label: 'Database',
+      items: ['MySQL', 'PostgreSQL', 'Cloudflare D1', 'AWS RDS', 'SQLite'],
+    },
+  ]
 
   return (
     <PageShell icon={User} contentClassName="bg-black">
@@ -56,6 +83,11 @@ export default function About() {
                           {item.company}
                         </h2>
                         <p className="mt-1 text-sm text-white/68">{item.role}</p>
+                        {item.summary ? (
+                          <p className="mt-3 text-sm text-white/58 leading-relaxed">
+                            {item.summary}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -67,14 +99,23 @@ export default function About() {
 
         <section className="mt-12">
           <h3 className="text-xs uppercase tracking-[0.18em] text-white/45">Skills</h3>
-          <div className="mt-4 flex flex-wrap gap-2.5">
-            {skills.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white/78"
-              >
-                {skill}
-              </span>
+          <div className="mt-5 grid gap-6 md:grid-cols-2">
+            {skillGroups.map((group) => (
+              <div key={group.label} className="rounded-2xl border border-white/12 bg-white/[0.03] p-5">
+                <p className="text-xs uppercase tracking-[0.14em] text-white/50">
+                  {group.label}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2.5">
+                  {group.items.map((skill) => (
+                    <span
+                      key={skill}
+                      className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white/78"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>

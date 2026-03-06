@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
+import useTypewriter from '@/hooks/useTypewriter'
+import SEO from '@/components/SEO'
 
 const menuItems = [
   {
@@ -26,50 +28,25 @@ const menuItems = [
   },
 ]
 
-function useTypewriter(
-  text: string,
-  typingMs = 90,
-  deletingMs = 55,
-  holdMs = 1400
-) {
-  const [value, setValue] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    let timer: number
-
-    if (!isDeleting && value.length < text.length) {
-      timer = window.setTimeout(() => {
-        setValue(text.slice(0, value.length + 1))
-      }, typingMs)
-    } else if (!isDeleting && value.length === text.length) {
-      timer = window.setTimeout(() => setIsDeleting(true), holdMs)
-    } else if (isDeleting && value.length > 0) {
-      timer = window.setTimeout(() => {
-        setValue(text.slice(0, value.length - 1))
-      }, deletingMs)
-    } else {
-      timer = window.setTimeout(() => setIsDeleting(false), 500)
-    }
-
-    return () => window.clearTimeout(timer)
-  }, [value, isDeleting, text, typingMs, deletingMs, holdMs])
-
-  return value
-}
-
 export default function Home() {
   const navigate = useNavigate()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const typedLogging = useTypewriter('(...logging)')
 
   return (
-    <motion.div
-      className="min-h-screen bg-black px-5 py-10 md:px-10 md:py-14"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+    <>
+      <SEO
+        title="hee.dance - Software Engineer Portfolio"
+        description="Human-centered problems. Practical solutions. Explore my career, technical blog, articles, and utilities."
+        keywords="software engineer, portfolio, web development, blog, hee, developer"
+        url="https://hee.dance/"
+      />
+      <motion.div
+        className="min-h-screen bg-black px-5 py-10 md:px-10 md:py-14"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
       <div className="mx-auto flex min-h-[80vh] max-w-4xl flex-col items-center justify-center">
         <motion.p
           className="text-xs uppercase tracking-[0.18em] text-white/45"
@@ -142,5 +119,6 @@ export default function Home() {
         </section>
       </div>
     </motion.div>
+    </>
   )
 }

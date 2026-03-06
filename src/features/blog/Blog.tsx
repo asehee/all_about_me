@@ -1,5 +1,5 @@
 import { BookOpen, Plus } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { Post } from '@/types/blog'
 import { blogApi, writeTokenManager } from '@/services/blogApi'
@@ -10,10 +10,12 @@ import PostDetail from './components/PostDetail'
 import PostForm from './components/PostForm'
 import PageShell from '@/components/design/PageShell'
 import Modal from '@/components/design/Modal'
+import SEO from '@/components/SEO'
 
 export default function Blog() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { slug } = useParams<{ slug?: string }>()
   const isArticles = location.pathname.startsWith('/articles')
   const [posts, setPosts] = useState<Post[]>([])
   const [tags, setTags] = useState<string[]>([])
@@ -34,6 +36,18 @@ export default function Blog() {
     setHasWriteToken(writeTokenManager.exists())
     loadData()
   }, [])
+
+  // Handle URL slug parameter
+  useEffect(() => {
+    if (slug && posts.length > 0) {
+      const post = posts.find((p) => p.slug === slug)
+      if (post) {
+        setSelectedPostId(post.id)
+      }
+    } else if (!slug) {
+      setSelectedPostId(null)
+    }
+  }, [slug, posts])
 
   const loadData = async () => {
     setLoading(true)
@@ -72,13 +86,13 @@ export default function Blog() {
     : null
 
   const handlePostClick = (post: Post) => {
-    setSelectedPostId(post.id)
-    setEditingPostId(null)
-    setIsCreating(false)
+    const basePath = isArticles ? '/articles' : '/blog'
+    navigate(`${basePath}/${post.slug}`)
   }
 
   const handleBackToList = () => {
-    setSelectedPostId(null)
+    const basePath = isArticles ? '/articles' : '/blog'
+    navigate(basePath)
     setEditingPostId(null)
     setIsCreating(false)
   }
@@ -132,8 +146,42 @@ export default function Blog() {
     setNoticeMessage('Write token cleared.')
   }
 
+  // Extract plain text from HTML for description
+  const getPlainTextDescription = (html: string) => {
+    const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+    return text.length > 160 ? text.substring(0, 157) + '...' : text
+  }
+
   return (
-    <PageShell icon={BookOpen} contentClassName="bg-black">
+    <>
+      {selectedPost ? (
+        <SEO
+          title={`${selectedPost.title} - hee.dance`}
+          description={getPlainTextDescription(selectedPost.content)}
+          keywords={selectedPost.tags.join(', ')}
+          url={`https://hee.dance/${isArticles ? 'articles' : 'blog'}/${selectedPost.slug}`}
+          type="article"
+          author={selectedPost.author}
+          publishedTime={selectedPost.publishedAt || selectedPost.createdAt}
+          modifiedTime={selectedPost.updatedAt}
+        />
+      ) : (
+        <SEO
+          title={isArticles ? 'Articles - hee.dance' : 'Blog - hee.dance'}
+          description={
+            isArticles
+              ? 'Saved reads, highlights, and quick reviews about software engineering.'
+              : 'Technical notes and thoughts about software development.'
+          }
+          keywords={
+            isArticles
+              ? 'articles, reading, software engineering, tech highlights'
+              : 'blog, technical writing, software development, programming'
+          }
+          url={`https://hee.dance/${isArticles ? 'articles' : 'blog'}`}
+        />
+      )}
+      <PageShell icon={BookOpen} contentClassName="bg-black">
       <Modal
         open={Boolean(noticeMessage)}
         title="Notice"
@@ -310,5 +358,6 @@ export default function Blog() {
         </div>
       )}
     </PageShell>
+    </>
   )
 }

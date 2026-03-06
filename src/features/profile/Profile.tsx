@@ -2,6 +2,7 @@ import { BriefcaseBusiness } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '@/components/design/BackButton'
 import PageShell from '@/components/design/PageShell'
+import SEO from '@/components/SEO'
 
 export default function Profile() {
   const navigate = useNavigate()
@@ -28,7 +29,14 @@ export default function Profile() {
   const stack = ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Cloudflare', 'D1']
 
   return (
-    <PageShell icon={BriefcaseBusiness} contentClassName="bg-black">
+    <>
+      <SEO
+        title="Profile - hee.dance"
+        description="Representative work and production-ready features built with React, TypeScript, Vite, Tailwind CSS, Cloudflare, and D1."
+        keywords="portfolio, projects, work, React, TypeScript, Cloudflare, web development"
+        url="https://hee.dance/profile"
+      />
+      <PageShell icon={BriefcaseBusiness} contentClassName="bg-black">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <BackButton label="Home" onClick={() => navigate('/')} />
@@ -84,5 +92,6 @@ export default function Profile() {
         </section>
       </div>
     </PageShell>
+    </>
   )
 }
