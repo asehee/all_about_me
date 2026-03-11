@@ -20,6 +20,7 @@ export interface Post {
   author: string
   createdAt: string
   updatedAt: string
+  commentCount?: number
   comments: Comment[]
 }
 

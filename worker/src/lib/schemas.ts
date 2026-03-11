@@ -64,6 +64,7 @@ export const postSchema = z.object({
   author: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  commentCount: z.number().int().nonnegative().optional(),
   comments: z.array(commentSchema),
 })
 

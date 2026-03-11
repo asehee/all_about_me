@@ -16,6 +16,10 @@ interface PostRow {
   updated_at: string
 }
 
+interface PostSummaryRow extends PostRow {
+  comment_count: number
+}
+
 interface CommentRow {
   id: string
   post_id: number
@@ -110,6 +114,31 @@ const fetchTagsByPostId = async (db: D1Database, postId: number): Promise<string
   return (result.results ?? []).map((row) => row.name)
 }
 
+const fetchTagsByPostIds = async (db: D1Database, postIds: number[]): Promise<Map<number, string[]>> => {
+  const byPostId = new Map<number, string[]>()
+  if (postIds.length === 0) return byPostId
+
+  const placeholders = postIds.map(() => '?').join(', ')
+  const result = await db
+    .prepare(
+      `SELECT pt.post_id, t.name
+       FROM post_tags pt
+       JOIN tags t ON t.id = pt.tag_id
+       WHERE pt.post_id IN (${placeholders})
+       ORDER BY t.name ASC`,
+    )
+    .bind(...postIds)
+    .all<{ post_id: number; name: string }>()
+
+  for (const row of result.results ?? []) {
+    const current = byPostId.get(row.post_id) ?? []
+    current.push(row.name)
+    byPostId.set(row.post_id, current)
+  }
+
+  return byPostId
+}
+
 const buildCommentTree = (rows: CommentRow[]): Comment[] => {
   const byId = new Map<string, Comment>()
   const roots: Comment[] = []
@@ -160,6 +189,83 @@ const fetchCommentsByPostId = async (db: D1Database, postId: number): Promise<Co
   return buildCommentTree(rows.results ?? [])
 }
 
+const toPostSummary = (
+  row: PostSummaryRow,
+  tagsByPostId: Map<number, string[]>,
+): Post => ({
+  id: String(row.id),
+  title: row.title,
+  content: row.content,
+  slug: row.slug,
+  status: row.status,
+  type: row.type,
+  publishedAt: toIso(row.published_at),
+  tags: tagsByPostId.get(row.id) ?? [],
+  author: row.author,
+  createdAt: toIso(row.created_at) ?? new Date().toISOString(),
+  updatedAt: toIso(row.updated_at) ?? new Date().toISOString(),
+  commentCount: row.comment_count,
+  comments: [],
+})
+
+export const listPostSummaries = async (db: D1Database, type?: PostRow['type']): Promise<Post[]> => {
+  const baseQuery =
+    `SELECT p.id, p.title, substr(p.content, 1, 600) AS content, p.slug, p.status, p.type,
+            p.published_at, p.author, p.created_at, p.updated_at,
+            COALESCE(c.comment_count, 0) AS comment_count
+     FROM posts p
+     LEFT JOIN (
+       SELECT post_id, COUNT(*) AS comment_count
+       FROM comments
+       GROUP BY post_id
+     ) c ON c.post_id = p.id` +
+    (type ? ' WHERE p.type = ?' : '') +
+    ' ORDER BY datetime(p.created_at) DESC'
+
+  const statement = db.prepare(baseQuery)
+  const rows = type
+    ? await statement.bind(type).all<PostSummaryRow>()
+    : await statement.all<PostSummaryRow>()
+  const postRows = rows.results ?? []
+  if (postRows.length === 0) return []
+
+  const postIds = postRows.map((row) => row.id)
+  const tagsByPostId = await fetchTagsByPostIds(db, postIds)
+  return postRows.map((row) => toPostSummary(row, tagsByPostId))
+}
+
+const fetchCommentsByPostIds = async (
+  db: D1Database,
+  postIds: number[],
+): Promise<Map<number, Comment[]>> => {
+  const byPostId = new Map<number, Comment[]>()
+  if (postIds.length === 0) return byPostId
+
+  const placeholders = postIds.map(() => '?').join(', ')
+  const rows = await db
+    .prepare(
+      `SELECT id, post_id, parent_id, author, content, created_at, deleted_at
+       FROM comments
+       WHERE post_id IN (${placeholders})
+       ORDER BY post_id ASC, datetime(created_at) ASC`,
+    )
+    .bind(...postIds)
+    .all<CommentRow>()
+
+  const grouped = new Map<number, CommentRow[]>()
+  for (const row of rows.results ?? []) {
+    const current = grouped.get(row.post_id) ?? []
+    current.push(row)
+    grouped.set(row.post_id, current)
+  }
+
+  for (const [postId, postRows] of grouped.entries()) {
+    byPostId.set(postId, buildCommentTree(postRows))
+  }
+
+  return byPostId
+}
+
 const toPost = async (db: D1Database, row: PostRow): Promise<Post> => {
   const [tags, comments] = await Promise.all([
     fetchTagsByPostId(db, row.id),
@@ -190,8 +296,29 @@ export const listPosts = async (db: D1Database, type?: PostRow['type']): Promise
     ' ORDER BY datetime(created_at) DESC'
   const statement = db.prepare(baseQuery)
   const rows = type ? await statement.bind(type).all<PostRow>() : await statement.all<PostRow>()
+  const postRows = rows.results ?? []
+  if (postRows.length === 0) return []
 
-  return Promise.all((rows.results ?? []).map((row) => toPost(db, row)))
+  const postIds = postRows.map((row) => row.id)
+  const [tagsByPostId, commentsByPostId] = await Promise.all([
+    fetchTagsByPostIds(db, postIds),
+    fetchCommentsByPostIds(db, postIds),
+  ])
+
+  return postRows.map((row) => ({
+    id: String(row.id),
+    title: row.title,
+    content: row.content,
+    slug: row.slug,
+    status: row.status,
+    type: row.type,
+    publishedAt: toIso(row.published_at),
+    tags: tagsByPostId.get(row.id) ?? [],
+    author: row.author,
+    createdAt: toIso(row.created_at) ?? new Date().toISOString(),
+    updatedAt: toIso(row.updated_at) ?? new Date().toISOString(),
+    comments: commentsByPostId.get(row.id) ?? [],
+  }))
 }
 
 export const getPostById = async (db: D1Database, postId: number): Promise<Post | null> => {

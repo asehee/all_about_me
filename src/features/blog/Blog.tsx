@@ -21,7 +21,8 @@ export default function Blog() {
   const [tags, setTags] = useState<string[]>([])
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
-  const [editingPostId, setEditingPostId] = useState<string | null>(null)
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null)
+  const [editingPost, setEditingPost] = useState<Post | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
@@ -48,6 +49,24 @@ export default function Blog() {
       setSelectedPostId(null)
     }
   }, [slug, posts])
+
+  useEffect(() => {
+    if (!selectedPostId) {
+      setSelectedPost(null)
+      return
+    }
+
+    const fetchDetail = async () => {
+      try {
+        const post = await blogApi.getPost(selectedPostId)
+        setSelectedPost(post)
+      } catch {
+        setSelectedPost(null)
+      }
+    }
+
+    void fetchDetail()
+  }, [selectedPostId])
 
   const loadData = async () => {
     setLoading(true)
@@ -78,13 +97,6 @@ export default function Blog() {
       : true
     return matchesTag && matchesQuery
   })
-  const selectedPost = selectedPostId
-    ? posts.find((p) => p.id === selectedPostId) ?? null
-    : null
-  const editingPost = editingPostId
-    ? posts.find((p) => p.id === editingPostId) ?? null
-    : null
-
   const handlePostClick = (post: Post) => {
     const basePath = isArticles ? '/articles' : '/blog'
     navigate(`${basePath}/${post.slug}`)
@@ -93,7 +105,7 @@ export default function Blog() {
   const handleBackToList = () => {
     const basePath = isArticles ? '/articles' : '/blog'
     navigate(basePath)
-    setEditingPostId(null)
+    setEditingPost(null)
     setIsCreating(false)
   }
 
@@ -103,19 +115,19 @@ export default function Blog() {
       return
     }
     setIsCreating(true)
-    setEditingPostId(null)
+    setEditingPost(null)
     setSelectedPostId(null)
   }
 
   const handlePostCreated = async () => {
     await loadData()
-    setEditingPostId(null)
+    setEditingPost(null)
     setIsCreating(false)
   }
 
   const handleEditPost = () => {
-    if (!selectedPostId) return
-    setEditingPostId(selectedPostId)
+    if (!selectedPost) return
+    setEditingPost(selectedPost)
     setSelectedPostId(null)
     setIsCreating(false)
   }
@@ -123,7 +135,14 @@ export default function Blog() {
   const handlePostDeleted = async () => {
     await loadData()
     setSelectedPostId(null)
-    setEditingPostId(null)
+    setEditingPost(null)
+  }
+
+  const handlePostDetailUpdate = async () => {
+    await loadData()
+    if (!selectedPostId) return
+    const refreshed = await blogApi.getPost(selectedPostId)
+    setSelectedPost(refreshed)
   }
 
   const openTokenInputModal = () => {
@@ -251,10 +270,10 @@ export default function Blog() {
           post={selectedPost}
           onBack={handleBackToList}
           onEdit={handleEditPost}
-          onUpdate={loadData}
+          onUpdate={handlePostDetailUpdate}
           onDelete={handlePostDeleted}
         />
-      ) : isCreating || editingPost ? (
+      ) : isCreating || Boolean(editingPost) ? (
         <PostForm
           mode={editingPost ? 'edit' : 'create'}
           initialPost={editingPost}

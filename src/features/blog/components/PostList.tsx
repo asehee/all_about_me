@@ -77,7 +77,7 @@ export default function PostList({ posts, onPostClick }: PostListProps) {
 
           <div className="mt-3 flex items-center justify-end">
             <span className="inline-flex items-center gap-1 text-xs text-white/40">
-              comments {post.comments.length}
+              comments {post.commentCount ?? post.comments.length}
             </span>
           </div>
         </motion.button>

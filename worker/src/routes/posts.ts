@@ -1,6 +1,13 @@
 import { Hono } from 'hono'
 import { authenticateWriteRequest } from '../lib/auth'
-import { createPost, deletePost, getPostById, listPosts, listTags, updatePost } from '../lib/db'
+import {
+  createPost,
+  deletePost,
+  getPostById,
+  listPostSummaries,
+  listTags,
+  updatePost,
+} from '../lib/db'
 import { ApiError, badRequest, notFound } from '../lib/errors'
 import { json } from '../lib/http'
 import {
@@ -41,7 +48,7 @@ export const registerPostsRoutes = (
   app.get('/posts', async (c) => {
     const ctx = c.get('requestContext')
     const type = parsePostType(c.req.query('type'))
-    const posts = await listPosts(ctx.env.DB, type)
+    const posts = await listPostSummaries(ctx.env.DB, type)
     const body = postsResponseSchema.parse({ posts })
     return json(ctx, body)
   })
