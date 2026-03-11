@@ -1,6 +1,6 @@
 import { BookOpen, Plus } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Post } from '@/types/blog'
 import { blogApi, writeTokenManager } from '@/services/blogApi'
 import BackButton from '@/components/design/BackButton'
@@ -32,8 +32,11 @@ export default function Blog() {
   const [showTokenInputModal, setShowTokenInputModal] = useState(false)
   const [tokenInput, setTokenInput] = useState('')
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null)
+  const didInitialLoad = useRef(false)
 
   useEffect(() => {
+    if (didInitialLoad.current) return
+    didInitialLoad.current = true
     setHasWriteToken(writeTokenManager.exists())
     loadData()
   }, [])
