@@ -113,8 +113,8 @@ export default function Blog() {
   }
 
   const handleCreatePost = () => {
-    if (!hasWriteToken) {
-      setShowAuthModal(true)
+    if (!auth.hasWriteToken) {
+      auth.setShowAuthModal(true)
       return
     }
     setIsCreating(true)
@@ -154,17 +154,13 @@ export default function Blog() {
   }
 
   const handleSaveWriteToken = () => {
-    if (!tokenInput.trim()) return
-    writeTokenManager.set(tokenInput)
-    setHasWriteToken(true)
-    setShowTokenInputModal(false)
-    setShowAuthModal(false)
-    setNoticeMessage('Write token set for this browser session.')
+    if (auth.handleSaveWriteToken()) {
+      setNoticeMessage('Write token set for this browser session.')
+    }
   }
 
   const handleClearWriteToken = () => {
-    writeTokenManager.clear()
-    setHasWriteToken(false)
+    auth.handleClearWriteToken()
     setNoticeMessage('Write token cleared.')
   }
 
@@ -218,19 +214,19 @@ export default function Blog() {
         }
       />
       <Modal
-        open={showAuthModal}
+        open={auth.showAuthModal}
         title="Write Token Required"
         description="Creating a post requires an authentication token. Please set your write token first."
         actions={
           <>
             <button
-              onClick={() => setShowAuthModal(false)}
+              onClick={() => auth.setShowAuthModal(false)}
               className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
             >
               Close
             </button>
             <button
-              onClick={openTokenInputModal}
+              onClick={auth.openTokenInputModal}
               className="rounded-lg border border-white/20 bg-white text-sm font-medium text-black px-4 py-2 hover:bg-white/90 transition-colors"
             >
               Set Write Token
@@ -239,13 +235,13 @@ export default function Blog() {
         }
       />
       <Modal
-        open={showTokenInputModal}
+        open={auth.showTokenInputModal}
         title="Set Write Token"
         children={
           <input
             type="password"
-            value={tokenInput}
-            onChange={(e) => setTokenInput(e.target.value)}
+            value={auth.tokenInput}
+            onChange={(e) => auth.setTokenInput(e.target.value)}
             placeholder="Enter write token"
             className="mt-4 w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
           />
@@ -253,14 +249,14 @@ export default function Blog() {
         actions={
           <>
             <button
-              onClick={() => setShowTokenInputModal(false)}
+              onClick={() => auth.setShowTokenInputModal(false)}
               className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveWriteToken}
-              disabled={!tokenInput.trim()}
+              disabled={!auth.tokenInput.trim()}
               className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
             >
               Save
@@ -333,7 +329,7 @@ export default function Blog() {
                     onClick={hasWriteToken ? handleClearWriteToken : openTokenInputModal}
                     className="h-8 whitespace-nowrap rounded-lg border border-white/20 px-3 text-xs text-white/80 hover:bg-white/10 transition-colors"
                   >
-                    {hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
+                    {auth.hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
                   </button>
                   <button
                     onClick={handleCreatePost}
@@ -373,7 +369,7 @@ export default function Blog() {
                   </div>
                 </div>
               ) : (
-                <PostList posts={filteredPosts} onPostClick={handlePostClick} />
+                <PostList posts={filteredPosts} onPostClick={nav.handlePostClick} />
               )}
             </div>
           </div>
