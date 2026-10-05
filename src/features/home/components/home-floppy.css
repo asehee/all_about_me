@@ -57,7 +57,7 @@
 @keyframes home-floppy-drift { 0%, 100% { transform: translateY(0) rotate(1deg); } 50% { transform: translateY(-9px) rotate(-1deg); } }
 @keyframes home-floppy-shadow { 0%, 100% { transform: scaleX(1); opacity: .8; } 50% { transform: scaleX(.92); opacity: .5; } }
 @media (max-width: 760px) {
-  .home-floppy-scene { top: 170px; width: 230px; }
+  .home-floppy-scene { top: auto; bottom: calc(21vw + 96px); width: clamp(200px, 58vw, 260px); }
   .home-floppy-label-title { font-size: 30px; }
 }
 @media (prefers-reduced-motion: reduce) {
