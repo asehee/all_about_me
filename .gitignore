@@ -26,9 +26,40 @@ dist-ssr
 
 /worker
 
-.env.*
 wrangler.*
 
 .md
 
 .claude
+
+# Local secrets (keep placeholder examples shareable)
+.env
+.env.*
+!.env.example
+!.env.*.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+!.dev.vars.*.example
+
+# Generated sitemap and TypeScript build cache
+/public/sitemap.xml
+*.tsbuildinfo
+
+# Local databases and private keys
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
+*.key
+*.pem
+*.p12
+*.pfx

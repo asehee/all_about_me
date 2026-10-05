@@ -1,0 +1,71 @@
+.home-editorial {
+  --home-ink: #23221f;
+  --home-muted: #6d6a65;
+  --home-gutter: clamp(24px, 7vw, 112px);
+  color: var(--home-ink);
+  background: #f8f7f4;
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.home-editorial a { color: inherit; text-decoration: none; }
+.home-editorial a:focus-visible { outline: 2px solid #7355b7; outline-offset: 6px; }
+.home-editorial ::selection { background: #ddd0f6; }
+.home-skip { position: fixed; top: 16px; left: 16px; z-index: 60; padding: 12px 18px; background: white; transform: translateY(-160%); }
+.home-skip:focus { transform: none; }
+.home-hero { position: relative; min-height: 760px; height: 100svh; max-height: 1150px; overflow: hidden; background: #fdfcf9; }
+.home-intro { position: absolute; top: clamp(40px, 7vh, 80px); left: var(--home-gutter); right: var(--home-gutter); z-index: 3; display: flex; justify-content: space-between; gap: 24px; font-size: 16px; line-height: 1.5; letter-spacing: -.025em; }
+.home-intro a { color: var(--home-muted); text-decoration: underline; text-underline-offset: 4px; transition: color .2s; }
+.home-intro a:hover { color: #7355b7; }
+.home-wordmark { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-family: Georgia, 'Times New Roman', serif; font-size: 21.1vw; font-weight: 400; line-height: 1; letter-spacing: -.065em; white-space: nowrap; }
+.home-wordmark span { color: #8665b6; }
+.home-hero-bottom { position: absolute; bottom: calc(21vw + 48px); left: var(--home-gutter); right: var(--home-gutter); display: flex; justify-content: flex-end; gap: 20px; font-size: 11px; color: var(--home-muted); }
+.home-hero-bottom a { display: inline-flex; align-items: center; gap: 10px; }
+.home-hero-bottom a:hover { color: var(--home-ink); }
+.home-badge-scene { --badge-scale: 1; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 320px; height: 64%; min-height: 430px; }
+.home-lanyard { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.home-badge { position: absolute; top: 0; left: 50%; margin-left: -125px; width: 250px; height: 337px; padding: 27px 12px 12px; transform-origin: 50% 13px; transform: translateY(160px) rotate(4deg) scale(var(--badge-scale)); border: 1px solid #d4d2d080; border-radius: 10px; background: linear-gradient(125deg, #ffffff80, #eae9e233 50%, #ffffff99); box-shadow: 3px 12px 24px #27211a0b, inset 0 0 0 3px #ffffff60; will-change: transform; }
+.home-badge-clip { position: absolute; top: 3px; left: 50%; width: 7px; height: 15px; transform: translateX(-50%); border: 1px solid #aaa5ad; border-radius: 4px; background: linear-gradient(90deg, #eeece8, #c5c1c8); box-shadow: 0 1px 2px #0000000a; }
+
+.home-badge-slot { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 49px; height: 7px; background: #62596c; border-radius: 8px; box-shadow: inset 0 2px 3px #0004; }
+.home-badge-paper { height: 100%; background: #eeebe4; border: 1px solid #d5d0c7; border-radius: 4px; padding: 16px; }
+.home-badge-top { display: flex; align-items: center; justify-content: flex-end; font-size: 12px; }
+.home-badge-art { display: flex; justify-content: center; align-items: center; height: 126px; }
+.home-badge-emoji { font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; font-size: 88px; line-height: 1; user-select: none; pointer-events: none; }
+.home-badge-name { font-family: Georgia, serif; font-size: 29px; letter-spacing: -.05em; }
+.home-badge-job { margin-top: 9px; font-size: 12px; line-height: 1.5; color: var(--home-muted); }
+.home-badge-bottom { margin-top: 20px; padding-top: 12px; border-top: 1px solid #ccc7bf; display: flex; justify-content: flex-end; align-items: center; font-size: 7px; letter-spacing: .03em; }
+.home-barcode { width: 42px; height: 19px; background: repeating-linear-gradient(90deg, #514b43 0 1px, transparent 1px 3px, #514b43 3px 5px, transparent 5px 6px); }
+.home-explore { padding: 78px 0 96px; scroll-margin-top: 24px; }
+.home-section-label { padding: 0 var(--home-gutter) 28px; display: flex; justify-content: space-between; color: var(--home-muted); font-size: 11px; }
+.home-section-label h2 { font: inherit; }
+.home-entry { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 24px; min-height: 144px; padding: 30px var(--home-gutter); border-top: 1px solid #e1dfda; transition: background .25s; }
+.home-entry:last-child { border-bottom: 1px solid #e1dfda; }
+.home-entry:hover, .home-entry:focus-visible { background: #fffefa; }
+.home-entry-index { font-size: 10px; color: var(--home-muted); letter-spacing: .06em; }
+.home-entry h3 { font-family: Georgia, serif; font-size: clamp(36px, 4.5vw, 56px); font-weight: 400; line-height: 1.1; letter-spacing: -.045em; }
+.home-entry-arrow { width: 25px; height: 25px; color: #8f8b84; transition: transform .25s, color .25s; }
+.home-entry:hover .home-entry-arrow, .home-entry:focus-visible .home-entry-arrow { transform: translate(3px, -3px); color: #7355b7; }
+.home-entry:active { background: #eeece6; }
+.home-footer { padding: 28px var(--home-gutter); background: #eeece6; }
+.home-footer-bottom { display: flex; justify-content: space-between; gap: 24px; color: var(--home-muted); font-size: 11px; }
+.home-footer-bottom a:hover { color: var(--home-ink); }
+
+@media (min-width: 1600px) {
+  .home-wordmark { font-size: 338px; }
+  .home-hero-bottom { bottom: 386px; }
+}
+@media (max-width: 760px) {
+  .home-hero { height: 100svh; min-height: 720px; max-height: 950px; }
+  .home-intro { top: 32px; font-size: 13px; gap: 20px; }
+  .home-badge-scene { --badge-scale: .82; width: 280px; height: calc(100% - 31vw - 78px); min-height: 400px; }
+  .home-badge { left: 50%; margin-left: -125px; transform: scale(.82) rotate(9deg); transform-origin: 50% 13px; }
+  .home-badge:hover { transform: scale(.82) rotate(3deg); }
+  .home-wordmark { bottom: 24px; font-size: 21vw; }
+  .home-hero-bottom { bottom: calc(21vw + 52px); font-size: 10px; }
+  .home-explore { padding: 44px 0 56px; }
+  .home-section-label { font-size: 10px; padding-bottom: 20px; }
+  .home-entry { grid-template-columns: 24px 1fr auto; gap: 16px; min-height: 112px; padding: 26px var(--home-gutter); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-editorial *, .home-editorial *::before, .home-editorial *::after { transition: none !important; }
+}
