@@ -1,6 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { Link, NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import './editorial.css'
 
 interface PageShellProps {
   icon: ComponentType<{ className?: string }>
@@ -8,33 +9,35 @@ interface PageShellProps {
   contentClassName?: string
 }
 
-export default function PageShell({
-  icon: Icon,
-  children,
-  contentClassName,
-}: PageShellProps) {
-  return (
-    <div className="relative min-h-screen bg-black text-white">
-      <motion.div
-        className="fixed left-6 top-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-black/55 text-white backdrop-blur-md"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Icon className="h-7 w-7" />
-      </motion.div>
+const navigation = [
+  { path: '/about', label: 'Career' },
+  { path: '/blog', label: 'Blog' },
+  { path: '/articles', label: 'Articles' },
+  { path: '/etc', label: 'Utils' },
+]
 
-      <motion.div
-        className={cn(
-          'min-h-screen overflow-y-auto p-8 pt-24 md:p-12 md:pt-24',
-          contentClassName
-        )}
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+export default function PageShell({ icon: Icon, children, contentClassName }: PageShellProps) {
+  return (
+    <div className="page-shell">
+      <a className="page-skip" href="#page-content">Skip to content</a>
+      <header className="page-navigation">
+        <Link to="/" className="page-brand" aria-label="hee.dance home">hee<span>.</span></Link>
+        <nav aria-label="Main navigation">
+          {navigation.map((item) => (
+            <NavLink key={item.path} to={item.path} className={({ isActive }) => cn('page-nav-link', isActive && 'is-current')}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <Icon className="page-navigation-icon" />
+      </header>
+      <main
+        id="page-content"
+        className={cn('page-content', contentClassName)}
       >
         {children}
-      </motion.div>
+      </main>
+      <footer className="page-footer"><span>© {new Date().getFullYear()} hee</span><Link to="/">Back home ↗</Link></footer>
     </div>
   )
 }

@@ -24,10 +24,8 @@ dist-ssr
 *.sln
 *.sw?
 
-/worker
-
 wrangler.*
-
+/docs
 .md
 
 .claude

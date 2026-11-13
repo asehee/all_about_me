@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, Tag, MessageCircle, Send, Trash2, Pencil } from 'lucide-react'
 import type { Post, Comment } from '@/types/blog'
 import { useState } from 'react'
@@ -94,45 +93,48 @@ export default function PostDetail({
     return (
       <div
         key={comment.id}
-        className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} space-y-4`}
+        className={`${depth > 0 && depth < 3 ? 'ml-3 mt-4 sm:ml-6' : 'mt-4'} space-y-4`}
       >
-        <div className="rounded-lg border border-white/12 bg-white/[0.03] p-4">
-          <div className="flex items-start justify-between mb-2">
+        <div className="rounded-lg border border-border bg-muted/50 p-4">
+          <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
             <div>
-              <span className="text-white font-medium">{comment.author}</span>
-              <span className="text-white/40 text-sm ml-3">
+              <span className="text-foreground font-medium">{comment.author}</span>
+              <span className="text-muted-foreground text-sm ml-3">
                 {new Date(comment.createdAt).toLocaleString('en-US')}
               </span>
             </div>
             <button
+              aria-label="Delete comment"
               onClick={() => handleDeleteComment(comment.id)}
-              className="text-white/40 hover:text-red-300 transition-colors"
+              className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
 
-          <p className="text-white/80 mb-3">{comment.content}</p>
+          <p className="text-foreground/80 break-words mb-3">{comment.content}</p>
 
           <button
             onClick={() => setReplyTo(isReplyingTo ? null : comment.id)}
-            className="text-sm text-white/65 hover:text-white/85 transition-colors"
+            className="text-sm text-muted-foreground hover:text-primary/80 transition-colors"
           >
             {isReplyingTo ? 'Cancel' : 'Reply'}
           </button>
 
           {/* 답글 작성 폼 */}
           {isReplyingTo && (
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <input
                 type="text"
+                aria-label="Nickname"
                 placeholder="Nickname"
                 value={commentAuthor}
                 onChange={(e) => setCommentAuthor(e.target.value)}
-                className="w-40 rounded-lg border border-white/20 bg-white/[0.03] px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+                className="w-full sm:w-32 rounded-lg border border-border bg-muted/50 px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
               <input
                 type="text"
+                aria-label="Write a reply"
                 placeholder="Write a reply"
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
@@ -142,12 +144,13 @@ export default function PostDetail({
                     handleAddComment(comment.id)
                   }
                 }}
-                className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+                className="min-w-0 flex-1 rounded-lg border border-border bg-muted/50 px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
               <button
+                aria-label="Send reply"
                 onClick={() => handleAddComment(comment.id)}
                 disabled={submitting}
-                className="rounded-lg border border-white/20 bg-white px-4 py-2 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
+                className="rounded-lg border border-border bg-foreground px-4 py-2 text-background hover:bg-foreground/90 transition-colors disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -166,12 +169,7 @@ export default function PostDetail({
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-black p-8"
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-    >
+    <div className="mx-auto max-w-3xl">
       <Modal
         open={showTokenModal}
         title="Write Token Required"
@@ -182,7 +180,7 @@ export default function PostDetail({
             value={tokenInput}
             onChange={(e) => setTokenInput(e.target.value)}
             placeholder="Enter write token"
-            className="mt-4 w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+            className="mt-4 w-full rounded-lg border border-border bg-muted/50 px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
           />
         }
         actions={
@@ -192,14 +190,14 @@ export default function PostDetail({
                 setShowTokenModal(false)
                 setTokenInput('')
               }}
-              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+              className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/80 hover:bg-accent/60 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveWriteToken}
               disabled={!tokenInput.trim()}
-              className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
+              className="rounded-lg border border-border bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               Save
             </button>
@@ -218,13 +216,13 @@ export default function PostDetail({
           <>
             <button
               onClick={() => setConfirmState(null)}
-              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+              className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/80 hover:bg-accent/60 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmAction}
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-foreground hover:bg-red-600 transition-colors"
             >
               Delete
             </button>
@@ -233,10 +231,10 @@ export default function PostDetail({
       />
       <div className="mx-auto max-w-4xl">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
@@ -245,14 +243,14 @@ export default function PostDetail({
           <div className="flex items-center gap-2">
             <button
               onClick={onEdit}
-              className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-foreground/80 hover:text-primary transition-colors"
             >
               <Pencil className="w-4 h-4" />
               Edit
             </button>
             <button
               onClick={handleDeletePost}
-              className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-destructive hover:text-destructive transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -263,10 +261,10 @@ export default function PostDetail({
         {/* 포스트 내용 */}
         <article className="mb-12">
           {/* 제목 */}
-          <h1 className="text-4xl font-bold text-white mb-6">{post.title}</h1>
+          <h1 className="post-title mb-6">{post.title}</h1>
 
           {/* 메타 정보 */}
-          <div className="mb-8 flex items-center gap-6 border-b border-white/12 pb-6 text-white/60">
+          <div className="mb-8 flex flex-wrap items-center gap-4 border-b border-border pb-6 text-muted-foreground">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="text-sm">
@@ -277,9 +275,9 @@ export default function PostDetail({
             {post.tags.length > 0 && (
               <div className="flex items-center gap-2">
                 <Tag className="w-4 h-4" />
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {post.tags.map((tag) => (
-                    <span key={tag} className="text-sm text-white/75">
+                    <span key={tag} className="text-sm text-foreground/80">
                       #{tag}
                     </span>
                   ))}
@@ -289,19 +287,19 @@ export default function PostDetail({
           </div>
 
           {/* 내용 */}
-          <div className="prose prose-invert max-w-none">
+          <div className="max-w-none">
             <div
-              className="rich-content text-white/80"
+              className="rich-content text-foreground/80"
               dangerouslySetInnerHTML={{ __html: normalizedContent }}
             />
           </div>
         </article>
 
         {/* 댓글 섹션 */}
-        <section className="border-t border-white/10 pt-8">
+        <section className="border-t border-border pt-8">
           <div className="flex items-center gap-2 mb-6">
-            <MessageCircle className="w-5 h-5 text-white" />
-            <h2 className="text-2xl font-bold text-white">
+            <MessageCircle className="w-5 h-5 text-foreground" />
+            <h2 className="text-2xl font-normal text-foreground">
               Comments {post.comments?.length || 0}
             </h2>
           </div>
@@ -311,18 +309,20 @@ export default function PostDetail({
             <div className="flex flex-col gap-3 md:flex-row md:items-center">
               <input
                 type="text"
+                aria-label="Nickname"
                 placeholder="Nickname"
                 value={replyTo === null ? commentAuthor : ''}
                 onChange={(e) => {
                   if (replyTo === null) setCommentAuthor(e.target.value)
                 }}
                 disabled={replyTo !== null}
-                className="w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50 md:w-56"
+                className="w-full rounded-lg border border-border bg-muted/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors disabled:opacity-50 md:w-56"
               />
               <div className="flex flex-1 gap-2">
                 <input
                   type="text"
-                  placeholder="Write a comment"
+                  aria-label="Write a comment"
+                placeholder="Write a comment"
                   value={replyTo === null ? commentContent : ''}
                   onChange={(e) => {
                     if (replyTo === null) setCommentContent(e.target.value)
@@ -334,12 +334,13 @@ export default function PostDetail({
                     }
                   }}
                   disabled={replyTo !== null}
-                  className="flex-1 rounded-lg border border-white/20 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors disabled:opacity-50"
+                  className="min-w-0 flex-1 rounded-lg border border-border bg-muted/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
                 />
                 <button
+                  aria-label="Send comment"
                   onClick={() => handleAddComment()}
                   disabled={submitting || replyTo !== null}
-                  className="rounded-lg border border-white/20 bg-white px-6 py-3 text-black hover:bg-white/90 transition-colors disabled:opacity-50"
+                  className="rounded-lg border border-border bg-foreground px-6 py-3 text-background hover:bg-foreground/90 transition-colors disabled:opacity-50"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -352,13 +353,13 @@ export default function PostDetail({
             {post.comments && post.comments.length > 0 ? (
               post.comments.map((comment) => renderComment(comment))
             ) : (
-              <p className="text-white/40 text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 Be the first to comment
               </p>
             )}
           </div>
         </section>
       </div>
-    </motion.div>
+    </div>
   )
 }

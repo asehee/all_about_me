@@ -21,6 +21,7 @@
     "d1:migrate:remote": "wrangler d1 migrations apply journal-db --remote --config wrangler.toml",
     "pages:deploy:preview": "npm run build:preview && wrangler pages deploy dist --project-name new-project --branch all-about-me --commit-dirty=true",
     "pages:deploy:prod": "npm run build:prod && wrangler pages deploy dist --project-name new-project --branch production --commit-dirty=true",
+    "release:prod": "sh -c 'export VITE_API_BASE_URL=https://all-about-me-api.asehee127.workers.dev; npm run d1:migrate:remote && npm run worker:deploy && npm run pages:deploy:prod'",
     "release:prod:auth": "npm run d1:migrate:remote && npm run worker:secret:auth && npm run worker:deploy && npm run pages:deploy:prod"
   },
   "dependencies": {

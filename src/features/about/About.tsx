@@ -47,44 +47,42 @@ export default function About() {
   ]
 
   return (
-    <PageShell icon={User} contentClassName="bg-black">
+    <PageShell icon={User} >
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <BackButton label="Home" onClick={() => navigate('/')} />
         </div>
 
         <header>
-          <p className="text-xs uppercase tracking-[0.18em] text-white/45">About</p>
-          <h3 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-6xl">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">About</p>
+          <h1 className="mt-4 page-title">
             Career
-          </h3>
+          </h1>
         </header>
 
         <section className="mt-14">
           <div className="relative">
-            <div className="absolute bottom-2 left-3 top-2 w-px -translate-x-1/2 bg-white/12" />
-            <div className="absolute bottom-2 left-3 top-2 w-px -translate-x-1/2 bg-gradient-to-b from-white/70 via-white/45 to-white/25" />
+            <div className="absolute bottom-2 left-3 top-2 w-px -translate-x-1/2 bg-border" />
 
             <div className="space-y-10">
               {experiences.map((item) => (
                 <article key={item.company} className="relative pl-14">
                   <span className="absolute left-3 top-3.5 z-10 h-3 w-3 -translate-x-1/2">
-                    <span className="absolute inset-0 rounded-full border border-white/45 bg-black shadow-[0_0_0_3px_rgba(255,255,255,0.06)]" />
-                    <span className="absolute inset-0 rounded-full border border-white/30 animate-[ping_3s_ease-out_infinite]" />
+                    <span className="absolute inset-0 rounded-full border border-border bg-background shadow-[0_0_0_3px_rgba(255,255,255,0.06)]" />
                   </span>
 
                   <div className="pb-4">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs uppercase tracking-[0.12em] text-white/45">
+                        <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                           {item.period}
                         </p>
-                        <h2 className="mt-2 text-2xl font-medium text-white md:text-[2rem]">
+                        <h2 className="mt-2 text-2xl font-medium text-foreground md:text-[2rem]">
                           {item.company}
                         </h2>
-                        <p className="mt-1 text-sm text-white/68">{item.role}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{item.role}</p>
                         {item.summary ? (
-                          <p className="mt-3 text-sm text-white/58 leading-relaxed">
+                          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                             {item.summary}
                           </p>
                         ) : null}
@@ -98,18 +96,18 @@ export default function About() {
         </section>
 
         <section className="mt-12">
-          <h3 className="text-xs uppercase tracking-[0.18em] text-white/45">Skills</h3>
+          <h3 className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Skills</h3>
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             {skillGroups.map((group) => (
-              <div key={group.label} className="rounded-2xl border border-white/12 bg-white/[0.03] p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-white/50">
+              <div key={group.label} className="rounded-lg border border-border bg-muted/50 p-5">
+                <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
                   {group.label}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2.5">
                   {group.items.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white/78"
+                      className="rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm text-foreground/80"
                     >
                       {skill}
                     </span>

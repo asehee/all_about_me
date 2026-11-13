@@ -1,6 +1,6 @@
 import { BookOpen, Plus } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Post } from '@/types/blog'
 import { blogApi, writeTokenManager } from '@/services/blogApi'
 import BackButton from '@/components/design/BackButton'
@@ -32,22 +32,42 @@ export default function Blog() {
   const [showTokenInputModal, setShowTokenInputModal] = useState(false)
   const [tokenInput, setTokenInput] = useState('')
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null)
-  const didInitialLoad = useRef(false)
+  const listRequestId = useRef(0)
+  const [detailError, setDetailError] = useState<{ id: string; message: string } | null>(null)
+
+  const loadData = useCallback(async () => {
+    const requestId = ++listRequestId.current
+    setLoading(true)
+    setError(null)
+    try {
+      const postType = isArticles ? 'article' : 'blog'
+      const [fetchedPosts, fetchedTags] = await Promise.all([
+        blogApi.getPosts({ type: postType }),
+        blogApi.getTags({ type: postType }),
+      ])
+      if (requestId !== listRequestId.current) return
+      setPosts(fetchedPosts)
+      setTags(fetchedTags)
+    } catch (e) {
+      if (requestId !== listRequestId.current) return
+      const message = e instanceof Error ? e.message : 'Failed to load journal data'
+      setError(message)
+    } finally {
+      if (requestId === listRequestId.current) setLoading(false)
+    }
+  }, [isArticles])
 
   useEffect(() => {
-    if (didInitialLoad.current) return
-    didInitialLoad.current = true
     setHasWriteToken(writeTokenManager.exists())
-    loadData()
-  }, [])
+    void loadData()
+    return () => { listRequestId.current += 1 }
+  }, [loadData])
 
   // Handle URL slug parameter
   useEffect(() => {
-    if (slug && posts.length > 0) {
+    if (slug) {
       const post = posts.find((p) => p.slug === slug)
-      if (post) {
-        setSelectedPostId(post.id)
-      }
+      setSelectedPostId(post?.id ?? null)
     } else if (!slug) {
       setSelectedPostId(null)
     }
@@ -59,36 +79,27 @@ export default function Blog() {
       return
     }
 
+    let cancelled = false
     const fetchDetail = async () => {
       try {
         const post = await blogApi.getPost(selectedPostId)
+        if (cancelled) return
         setSelectedPost(post)
-      } catch {
+        setDetailError(post ? null : { id: selectedPostId, message: 'Post not found.' })
+      } catch (error) {
+        if (cancelled) return
         setSelectedPost(null)
+        setDetailError({ id: selectedPostId, message: error instanceof Error ? error.message : 'Unable to load this post.' })
       }
     }
 
     void fetchDetail()
+    return () => { cancelled = true }
   }, [selectedPostId])
 
-  const loadData = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const postType = isArticles ? 'article' : 'blog'
-      const [fetchedPosts, fetchedTags] = await Promise.all([
-        blogApi.getPosts({ type: postType }),
-        blogApi.getTags({ type: postType }),
-      ])
-      setPosts(fetchedPosts)
-      setTags(fetchedTags)
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to load journal data'
-      setError(message)
-    } finally {
-      setLoading(false)
-    }
-  }
+
+  const routePostId = posts.find((post) => post.slug === slug)?.id
+  const routeDetailError = detailError?.id === routePostId ? detailError?.message : null
 
   const filteredPosts = posts.filter((post) => {
     const matchesTag = selectedTag ? post.tags.includes(selectedTag) : true
@@ -113,8 +124,8 @@ export default function Blog() {
   }
 
   const handleCreatePost = () => {
-    if (!auth.hasWriteToken) {
-      auth.setShowAuthModal(true)
+    if (!hasWriteToken) {
+      setShowAuthModal(true)
       return
     }
     setIsCreating(true)
@@ -138,7 +149,7 @@ export default function Blog() {
   const handlePostDeleted = async () => {
     await loadData()
     setSelectedPostId(null)
-    setEditingPost(null)
+    handleBackToList()
   }
 
   const handlePostDetailUpdate = async () => {
@@ -154,13 +165,17 @@ export default function Blog() {
   }
 
   const handleSaveWriteToken = () => {
-    if (auth.handleSaveWriteToken()) {
-      setNoticeMessage('Write token set for this browser session.')
-    }
+    if (!tokenInput.trim()) return
+    writeTokenManager.set(tokenInput)
+    setHasWriteToken(true)
+    setShowTokenInputModal(false)
+    setShowAuthModal(false)
+    setNoticeMessage('Write token set for this browser session.')
   }
 
   const handleClearWriteToken = () => {
-    auth.handleClearWriteToken()
+    writeTokenManager.clear()
+    setHasWriteToken(false)
     setNoticeMessage('Write token cleared.')
   }
 
@@ -172,7 +187,7 @@ export default function Blog() {
 
   return (
     <>
-      {selectedPost ? (
+      {selectedPost && selectedPost.slug === slug ? (
         <SEO
           title={`${selectedPost.title} - hee.dance`}
           description={getPlainTextDescription(selectedPost.content)}
@@ -199,7 +214,7 @@ export default function Blog() {
           url={`https://hee.dance/${isArticles ? 'articles' : 'blog'}`}
         />
       )}
-      <PageShell icon={BookOpen} contentClassName="bg-black">
+      <PageShell icon={BookOpen} >
       <Modal
         open={Boolean(noticeMessage)}
         title="Notice"
@@ -207,27 +222,27 @@ export default function Blog() {
         actions={
           <button
             onClick={() => setNoticeMessage(null)}
-            className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors"
+            className="rounded-lg border border-border bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
           >
             OK
           </button>
         }
       />
       <Modal
-        open={auth.showAuthModal}
+        open={showAuthModal}
         title="Write Token Required"
         description="Creating a post requires an authentication token. Please set your write token first."
         actions={
           <>
             <button
-              onClick={() => auth.setShowAuthModal(false)}
-              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+              onClick={() => setShowAuthModal(false)}
+              className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/80 hover:bg-accent/60 transition-colors"
             >
               Close
             </button>
             <button
-              onClick={auth.openTokenInputModal}
-              className="rounded-lg border border-white/20 bg-white text-sm font-medium text-black px-4 py-2 hover:bg-white/90 transition-colors"
+              onClick={openTokenInputModal}
+              className="rounded-lg border border-border bg-foreground text-sm font-medium text-background px-4 py-2 hover:bg-foreground/90 transition-colors"
             >
               Set Write Token
             </button>
@@ -235,36 +250,36 @@ export default function Blog() {
         }
       />
       <Modal
-        open={auth.showTokenInputModal}
+        open={showTokenInputModal}
         title="Set Write Token"
         children={
           <input
             type="password"
-            value={auth.tokenInput}
-            onChange={(e) => auth.setTokenInput(e.target.value)}
+            value={tokenInput}
+            onChange={(e) => setTokenInput(e.target.value)}
             placeholder="Enter write token"
-            className="mt-4 w-full rounded-lg border border-white/20 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+            className="mt-4 w-full rounded-lg border border-border bg-muted/50 px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
           />
         }
         actions={
           <>
             <button
-              onClick={() => auth.setShowTokenInputModal(false)}
-              className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+              onClick={() => setShowTokenInputModal(false)}
+              className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/80 hover:bg-accent/60 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveWriteToken}
-              disabled={!auth.tokenInput.trim()}
-              className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
+              disabled={!tokenInput.trim()}
+              className="rounded-lg border border-border bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               Save
             </button>
           </>
         }
       />
-      {selectedPost ? (
+      {selectedPost && selectedPost.slug === slug && !isCreating && !editingPost ? (
         <PostDetail
           post={selectedPost}
           onBack={handleBackToList}
@@ -280,6 +295,25 @@ export default function Blog() {
           onBack={handleBackToList}
           onSuccess={handlePostCreated}
         />
+      ) : slug ? (
+        <div className="mx-auto max-w-3xl">
+          <BackButton onClick={handleBackToList} />
+          <div className="py-16" aria-live="polite" aria-busy={loading || (!error && !routeDetailError && Boolean(routePostId))}>
+            {error || routeDetailError || (!loading && !posts.some((post) => post.slug === slug)) ? (
+              <div className="space-y-4">
+                <p className="text-muted-foreground">{error || routeDetailError || 'Post not found.'}</p>
+                <button className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-accent/60" onClick={() => { setDetailError(null); setSelectedPostId(null); void loadData() }}>Retry</button>
+              </div>
+            ) : (
+              <div role="status">
+                <p className="mb-10 text-sm text-muted-foreground">Loading post…</p>
+                <div className="h-9 w-3/4 rounded bg-muted" />
+                <div className="mt-5 h-3 w-1/3 rounded bg-muted" />
+                <div className="mt-12 space-y-4">{[1, 2, 3, 4].map((line) => <div key={line} className="h-3 rounded bg-muted" />)}</div>
+              </div>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="mx-auto max-w-6xl">
           <div className="mb-6">
@@ -287,17 +321,17 @@ export default function Blog() {
           </div>
 
           <header>
-            <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
               {isArticles ? 'Reading' : 'Journal'}
             </p>
-            <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
+            <h1 className="mt-4 page-title">
               {isArticles ? 'Articles' : 'Notes'}
             </h1>
-            <p className="mt-5 text-sm text-white/62 md:text-base">
+            <p className="mt-5 text-sm text-muted-foreground md:text-base">
               {filteredPosts.length} {isArticles ? 'articles' : 'posts'}
             </p>
             {isArticles ? (
-              <p className="mt-3 text-sm text-white/55 md:text-base">
+              <p className="mt-3 text-sm text-muted-foreground md:text-base">
                 Saved reads, highlights, and quick reviews.
               </p>
             ) : null}
@@ -305,8 +339,8 @@ export default function Blog() {
 
           <div className="mt-10 grid gap-8 lg:gap-10 lg:grid-cols-[220px_minmax(0,1fr)]">
             <div className="order-2 lg:order-1">
-              <div className="mb-8 flex min-h-[56px] items-center border-b border-white/12 pb-4">
-                <p className="text-sm text-white/60">{isArticles ? 'Topics' : 'Tags'}</p>
+              <div className="mb-8 flex min-h-[56px] items-center border-b border-border pb-4">
+                <p className="text-sm text-muted-foreground">{isArticles ? 'Topics' : 'Tags'}</p>
               </div>
               <TagList
                 tags={tags}
@@ -316,8 +350,8 @@ export default function Blog() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="mb-8 flex min-h-[56px] flex-wrap items-center justify-between gap-3 border-b border-white/12 pb-4 lg:flex-nowrap">
-                <p className="text-sm text-white/60">
+              <div className="mb-8 flex min-h-[56px] flex-wrap items-center justify-between gap-3 border-b border-border pb-4 lg:flex-nowrap">
+                <p className="text-sm text-muted-foreground">
                   {selectedTag
                     ? `Filter: #${selectedTag}`
                     : isArticles
@@ -327,13 +361,13 @@ export default function Blog() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={hasWriteToken ? handleClearWriteToken : openTokenInputModal}
-                    className="h-8 whitespace-nowrap rounded-lg border border-white/20 px-3 text-xs text-white/80 hover:bg-white/10 transition-colors"
+                    className="h-8 whitespace-nowrap rounded-lg border border-border px-3 text-xs text-foreground/80 hover:bg-accent/60 transition-colors"
                   >
-                    {auth.hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
+                    {hasWriteToken ? 'Clear Write Token' : 'Set Write Token'}
                   </button>
                   <button
                     onClick={handleCreatePost}
-                    className="flex h-8 items-center gap-2 whitespace-nowrap rounded-lg border border-white/20 bg-white px-3.5 text-xs font-medium text-black hover:bg-white/90 transition-colors"
+                    className="flex h-8 items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-foreground px-3.5 text-xs font-medium text-background hover:bg-foreground/90 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     {isArticles ? 'New Scrap' : 'New'}
@@ -350,26 +384,26 @@ export default function Blog() {
                       ? 'Search by title, source, author'
                       : 'Search by title, content, author'
                   }
-                  className="w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+                  className="w-full rounded-lg border border-border bg-muted/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
 
               {loading ? (
-                <div className="text-white/60 text-center py-12">Loading...</div>
+                <div className="text-muted-foreground text-center py-12">Loading...</div>
               ) : error ? (
-                <div className="text-red-300/90 text-center py-12">
+                <div className="text-destructive text-center py-12">
                   {error}
                   <div className="mt-4">
                     <button
                       onClick={loadData}
-                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition-colors"
+                      className="px-4 py-2 rounded-lg bg-muted/50 hover:bg-accent/60 text-foreground text-sm transition-colors"
                     >
                       Retry
                     </button>
                   </div>
                 </div>
               ) : (
-                <PostList posts={filteredPosts} onPostClick={nav.handlePostClick} />
+                <PostList posts={filteredPosts} onPostClick={handlePostClick} />
               )}
             </div>
           </div>

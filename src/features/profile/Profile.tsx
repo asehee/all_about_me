@@ -36,38 +36,38 @@ export default function Profile() {
         keywords="portfolio, projects, work, React, TypeScript, Cloudflare, web development"
         url="https://hee.dance/profile"
       />
-      <PageShell icon={BriefcaseBusiness} contentClassName="bg-black">
+      <PageShell icon={BriefcaseBusiness} >
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <BackButton label="Home" onClick={() => navigate('/')} />
         </div>
 
         <header>
-          <p className="text-xs uppercase tracking-[0.18em] text-white/45">Work</p>
-          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white md:text-7xl">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Work</p>
+          <h1 className="mt-4 page-title">
             Selected output.
           </h1>
-          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/62 md:text-base">
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
             Representative work and the stack used to ship production-ready features.
           </p>
         </header>
 
         <section className="mt-14">
-          <div className="space-y-1 border-t border-white/12">
+          <div className="space-y-1 border-t border-border">
             {projects.map((item, index) => (
-              <article key={item.title} className="border-b border-white/12 py-5 md:py-6">
+              <article key={item.title} className="border-b border-border py-5 md:py-6">
                 <div className="grid gap-4 md:grid-cols-[90px_minmax(0,1fr)] md:gap-8">
-                  <p className="text-xs uppercase tracking-[0.12em] text-white/45">
+                  <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                     {item.period}
                   </p>
                   <div>
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="text-2xl font-medium text-white md:text-[2rem]">
+                      <h2 className="text-2xl font-medium text-foreground md:text-[2rem]">
                         {item.title}
                       </h2>
-                      <span className="text-xs text-white/35">0{index + 1}</span>
+                      <span className="text-xs text-muted-foreground">0{index + 1}</span>
                     </div>
-                    <p className="mt-3 text-sm leading-relaxed text-white/58">
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                       {item.description}
                     </p>
                   </div>
@@ -78,12 +78,12 @@ export default function Profile() {
         </section>
 
         <section className="mt-12">
-          <h3 className="text-xs uppercase tracking-[0.18em] text-white/45">Stack</h3>
+          <h3 className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Stack</h3>
           <div className="mt-4 flex flex-wrap gap-2.5">
             {stack.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white/78"
+                className="rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm text-foreground/80"
               >
                 {item}
               </span>

@@ -13,13 +13,14 @@ export default function BackButton({
 }: BackButtonProps) {
   return (
     <button
+      type="button"
       className={cn(
-        'inline-flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 text-white/90 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/10',
+        'inline-flex h-11 items-center gap-2 text-muted-foreground transition-colors hover:text-primary',
         className
       )}
       {...props}
     >
-      <ArrowLeft className="h-4 w-4" />
+      <ArrowLeft aria-hidden="true" className="h-4 w-4" />
       <span className="text-sm font-medium">{label}</span>
     </button>
   )

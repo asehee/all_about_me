@@ -43,7 +43,6 @@ function generateSitemap(blogPosts, articlePosts) {
     { loc: '/articles', priority: '0.9', changefreq: 'weekly' },
     { loc: '/profile', priority: '0.7', changefreq: 'monthly' },
     { loc: '/etc', priority: '0.6', changefreq: 'monthly' },
-    { loc: '/etc/github', priority: '0.5', changefreq: 'monthly' },
   ]
 
   const today = new Date().toISOString().split('T')[0]

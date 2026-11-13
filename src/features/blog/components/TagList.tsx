@@ -14,11 +14,13 @@ export default function TagList({
   return (
     <div className="flex flex-wrap gap-2.5">
       <motion.button
+        type="button"
+        aria-pressed={selectedTag === null}
         onClick={() => onTagSelect(null)}
         className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
           selectedTag === null
-            ? 'border-white bg-white text-black'
-            : 'border-white/20 bg-white/[0.03] text-white/70 hover:border-white/35 hover:text-white'
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-border bg-muted/50 text-foreground/80 hover:border-primary/50 hover:text-primary'
         }`}
         whileTap={{ scale: 0.98 }}
       >
@@ -27,11 +29,13 @@ export default function TagList({
       {tags.map((tag) => (
         <motion.button
           key={tag}
+          type="button"
+          aria-pressed={selectedTag === tag}
           onClick={() => onTagSelect(tag)}
           className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
             selectedTag === tag
-              ? 'border-white bg-white text-black'
-              : 'border-white/20 bg-white/[0.03] text-white/70 hover:border-white/35 hover:text-white'
+              ? 'border-primary bg-primary text-primary-foreground'
+              : 'border-border bg-muted/50 text-foreground/80 hover:border-primary/50 hover:text-primary'
           }`}
           whileTap={{ scale: 0.98 }}
         >

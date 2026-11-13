@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { ArrowLeft, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
@@ -84,14 +83,14 @@ export default function PostForm({
       Placeholder.configure({
         placeholder: 'Write your content',
         emptyNodeClass:
-          'is-empty before:content-[attr(data-placeholder)] before:text-white/30 before:float-left before:pointer-events-none before:h-0',
+          'is-empty before:content-[attr(data-placeholder)] before:text-muted-foreground before:float-left before:pointer-events-none before:h-0',
       }),
     ],
     content: initialPost?.content ?? '',
     editorProps: {
       attributes: {
         class:
-          'min-h-[420px] rounded-lg border border-white/15 bg-white/[0.03] px-6 py-4 text-white focus:outline-none',
+          'min-h-[420px] rounded-lg border border-border bg-muted/50 px-6 py-4 text-foreground focus:outline-none',
       },
     },
   })
@@ -155,12 +154,7 @@ export default function PostForm({
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-[#0a0a0a] p-8"
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-    >
+    <div className="mx-auto max-w-3xl">
       <Modal
         open={Boolean(validationMessage)}
         title="Validation"
@@ -168,7 +162,7 @@ export default function PostForm({
         actions={
           <button
             onClick={() => setValidationMessage(null)}
-            className="rounded-lg border border-white/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90 transition-colors"
+            className="rounded-lg border border-border bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
           >
             OK
           </button>
@@ -176,10 +170,10 @@ export default function PostForm({
       />
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
@@ -188,7 +182,7 @@ export default function PostForm({
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg border border-white/20 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg border border-border bg-foreground px-5 py-2.5 text-sm font-medium text-background hover:bg-foreground/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : isEditMode ? 'Update' : 'Save'}
@@ -201,10 +195,11 @@ export default function PostForm({
           <div>
             <input
               type="text"
+              aria-label="Post title"
               placeholder="Post title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-transparent text-4xl font-bold text-white placeholder:text-white/20 focus:outline-none"
+              className="editor-title w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
 
@@ -213,15 +208,16 @@ export default function PostForm({
             <div className="flex items-center gap-2">
               <input
                 type="text"
+                aria-label="Add tag"
                 placeholder="Type a tag and press enter"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+                className="flex-1 rounded-lg border border-border bg-muted/50 px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
               <button
                 onClick={handleAddTag}
-                className="rounded-lg border border-white/20 px-4 py-2 text-white/85 hover:bg-white/10 transition-colors"
+                className="rounded-lg border border-border px-4 py-2 text-foreground/80 hover:bg-accent/60 transition-colors"
               >
                 Add
               </button>
@@ -233,12 +229,12 @@ export default function PostForm({
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.03] px-3 py-1 text-sm text-white/75"
+                    className="flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-sm text-foreground/80"
                   >
                     #{tag}
                     <button
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-white transition-colors"
+                      className="hover:text-primary transition-colors"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -250,19 +246,20 @@ export default function PostForm({
 
           {/* 내용 */}
           <div>
-            <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-white/60">
+            <div className="editor-toolbar mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().toggleBold().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('bold')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Bold
               </button>
               <select
+                aria-label="Font size"
                 value={editor?.getAttributes('textStyle').fontSize ?? ''}
                 onChange={(e) => {
                   const value = e.target.value
@@ -273,7 +270,7 @@ export default function PostForm({
                   }
                   editor.chain().focus().setFontSize(value).run()
                 }}
-                className="rounded border border-white/20 bg-black/40 px-2 py-1 text-xs text-white/80"
+                className="rounded border border-border bg-card px-2 py-1 text-xs text-foreground/80"
               >
                 <option value="">Size</option>
                 <option value="12px">12</option>
@@ -289,8 +286,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('heading', { level: 2 })
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 H2
@@ -300,8 +297,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('heading', { level: 3 })
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 H3
@@ -311,8 +308,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleItalic().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('italic')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Italic
@@ -322,8 +319,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleStrike().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('strike')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Strike
@@ -333,8 +330,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleHighlight().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('highlight')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Highlight
@@ -344,8 +341,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleBulletList().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('bulletList')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Bullet
@@ -355,8 +352,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleOrderedList().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('orderedList')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Numbered
@@ -366,8 +363,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleTaskList().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('taskList')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Task
@@ -377,8 +374,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleBlockquote().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('blockquote')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Quote
@@ -388,8 +385,8 @@ export default function PostForm({
                 onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('codeBlock')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Code
@@ -409,8 +406,8 @@ export default function PostForm({
                 }}
                 className={`rounded border px-2.5 py-1 transition-colors ${
                   editor?.isActive('link')
-                    ? 'border-white/60 text-white'
-                    : 'border-white/20 text-white/70 hover:border-white/40'
+                    ? 'border-primary/40 bg-accent text-primary'
+                    : 'border-border text-foreground/80 hover:border-primary/50'
                 }`}
               >
                 Link
@@ -418,21 +415,21 @@ export default function PostForm({
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().setHorizontalRule().run()}
-                className="rounded border border-white/20 px-2.5 py-1 text-white/70 transition-colors hover:border-white/40"
+                className="rounded border border-border px-2.5 py-1 text-foreground/80 transition-colors hover:border-primary/50"
               >
                 HR
               </button>
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().undo().run()}
-                className="rounded border border-white/20 px-2.5 py-1 text-white/70 transition-colors hover:border-white/40"
+                className="rounded border border-border px-2.5 py-1 text-foreground/80 transition-colors hover:border-primary/50"
               >
                 Undo
               </button>
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().redo().run()}
-                className="rounded border border-white/20 px-2.5 py-1 text-white/70 transition-colors hover:border-white/40"
+                className="rounded border border-border px-2.5 py-1 text-foreground/80 transition-colors hover:border-primary/50"
               >
                 Redo
               </button>
@@ -441,6 +438,6 @@ export default function PostForm({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
